@@ -1,9 +1,9 @@
-= 0.6.2 - ???
+= 0.6.2 - 19-Dec-2009
 * Fixed an issue where stdin, stdout and stderr might not be inheritable
   even if the inherit option was set. Thanks go to Michael Buselli for the
   spot and the patch.
-* Added basic implementations of Process.getrlimit and Process.setrlimit.
-* Added the Process.get_affinity and Process.set_affinity methods.
+* Added a basic implementation of Process.getrlimit.
+* Added the Process.get_affinity method.
 * Added test-unit 2.x and sys-proctable as development dependencies.
 * Added the :uninstall and :build_gem Rake tasks to the Rakefile.
 * Bumped required version of windows-pr to 1.0.6.
