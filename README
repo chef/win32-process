@@ -1,7 +1,8 @@
 = Description
    This package provides the fork, wait, wait2, waitpid, and waitpid2 methods
    for MS Windows. In addition, it provides a different implementation of the
-   kill method, and a proper implementation of the Process.ppid method.
+   kill method, a proper implementation of Process.ppid, and decent analogues
+   of Process.getpriority, Process.setpriority and Process.getrlimit.
 
 = Prerequisites
    Ruby 1.8.2 or later.
@@ -101,7 +102,7 @@
    Other suggestions welcome.
 	
 == License
-   Ruby's
+   Artistic 2.0
 	
 == Copyright
    (C) 2003-2009 Daniel J. Berger
