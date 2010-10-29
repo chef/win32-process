@@ -1,3 +1,9 @@
+= 0.6.3 - ???
+* Added the job? method that returns whether or not the current process
+  is already in a job.
+* Added the setrlimit method.
+* Rakefile tweaks.
+
 = 0.6.2 - 19-Dec-2009
 * Fixed an issue where stdin, stdout and stderr might not be inheritable
   even if the inherit option was set. Thanks go to Michael Buselli for the
