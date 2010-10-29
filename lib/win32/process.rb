@@ -127,6 +127,14 @@ module Process
     [pmask, smask]
   end
 
+  # Returns whether or not the current process is part of a Job.
+  #
+  def job?
+    pbool = 0.chr * 4
+    IsProcessInJob(GetCurrentProcess(), nil, pbool)
+    pbool.unpack('L').first == 0 ? false : true
+  end
+
   # Gets the resource limit of the current process. Only a limited number
   # of flags are supported.
   #
@@ -147,21 +155,20 @@ module Process
   # same.
   #
   # If [0,0] is returned then it means no limit has been set.
+  #--
+  # TODO: Check FS type for RLIMIT_SIZE. If FAT32, return 4 GB.
+  # TODO: If the process is already part of a job, get and use that handle.
   #
   def getrlimit(resource)
     # Strictly for API compatibility (actually 4 GB on FAT32)
-    # TODO: Check FS type. If FAT32, return 4 GB.
     if resource == RLIMIT_FSIZE
       return ((1024**4) * 4) - (1024 * 64)
     end
 
-    # Put the current Ruby process in its own job unless it's already
-    # part of a job.
-    bool = 0.chr * 4
-    IsProcessInJob(GetCurrentProcess(), nil, bool)
-    bool = bool.unpack('L').first == 0 ? false : true
+    in_job = self.job?
 
-    unless bool
+    # Put the current process in a job if it's not already in one
+    unless in_job
       job_name = 'ruby_' + Time.now.to_s
 
       # Create a job object and add the current process to it
@@ -173,7 +180,7 @@ module Process
     end
 
     begin
-      unless bool
+      unless in_job
         unless AssignProcessToJobObject(handle, GetCurrentProcess())
           raise Error, get_last_error
         end
@@ -991,8 +998,9 @@ module Process
     pid 
   end
    
-  module_function :create, :fork, :get_affinity, :getrlimit, :getpriority, :kill, :ppid
-  module_function :setpriority, :wait, :wait2, :waitpid, :waitpid2, :uid
+  module_function :create, :fork, :get_affinity, :getrlimit, :getpriority
+  module_function :job?, :kill, :ppid, :setpriority, :setrlimit
+  module_function :wait, :wait2, :waitpid, :waitpid2, :uid
 end
 
 # Create a global fork method
