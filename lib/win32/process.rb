@@ -168,6 +168,7 @@ module Process
       end
     end
 
+    handle = nil
     in_job = Process.job?
 
     # Put the current process in a job if it's not already in one
@@ -192,6 +193,7 @@ module Process
       buf = 0.chr * 112 # sizeof(struct JOBJECT_EXTENDED_LIMIT_INFORMATION)
       val = nil         # value returned at end of method
 
+      # Set the LimitFlags member of the struct
       case resource
         when RLIMIT_CPU
           buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_TIME].pack('L')
@@ -218,10 +220,63 @@ module Process
           val = buf[96,4].unpack('L').first
       end
     ensure
-      CloseHandle(handle)
+      CloseHandle(handle) if handle
     end
 
     [val, val] # Return an array of two values to comply with spec
+  end
+
+  def setrlimit(resource, current_limit, max_limit = nil)
+    max_limit = current_limit
+
+    handle = nil
+    in_job = Process.job?
+
+    # Put the current process in a job if it's not already in one
+    unless in_job
+      job_name = 'ruby_' + Time.now.to_s
+
+      # Create a job object and add the current process to it
+      handle = CreateJobObject(nil, job_name)
+
+      if handle == 0
+        raise Error, get_last_error
+      end
+    end
+
+    begin
+      unless in_job
+        unless AssignProcessToJobObject(handle, GetCurrentProcess())
+          raise Error, get_last_error
+        end
+      end
+
+      # sizeof(struct JOBJECT_EXTENDED_LIMIT_INFORMATION)
+      buf = 0.chr * 112
+
+      # Set the LimitFlags and relevant members of the struct
+      case resource
+        when RLIMIT_CPU
+          buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_TIME].pack('L')
+          buf[0,8]  = [max_limit].pack('Q') # PerProcessUserTimeLimit
+        when RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS
+          buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_MEMORY].pack('L')
+          buf[96,4] = [max_limit].pack('L') # ProcessMemoryLimit
+      end
+
+      bool = SetInformationJobObject(
+        handle,
+        JobObjectExtendedLimitInformation,
+        buf,
+        buf.size
+      )
+
+      unless bool
+        raise Error, get_last_error
+      end
+    ensure
+      CloseHandle(handle) if handle
+    end
   end
 
   # Retrieves the priority class for the specified process id +int+. Unlike
