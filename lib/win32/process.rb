@@ -21,7 +21,7 @@ module Process
   undef_method :wait, :wait2, :waitpid, :waitpid2, :uid
    
   # The version of the win32-process library
-  WIN32_PROCESS_VERSION = '0.6.2'
+  WIN32_PROCESS_VERSION = '0.6.3'
   
   include Windows::Process
   include Windows::Thread
@@ -148,7 +148,7 @@ module Process
   # all refer to the Process memory limit. The Process::RLIMIT_CPU constant
   # refers to the per process user time limit. The Process::RLIMIT_FSIZE
   # constant is hard coded to the maximum file size on an NTFS filesystem,
-  # approximately 4TB.
+  # approximately 4TB (or 4GB if not NTFS).
   #
   # While a two element array is returned in order to comply with the spec,
   # there is no separate hard and soft limit. The values will always be the
@@ -156,16 +156,19 @@ module Process
   #
   # If [0,0] is returned then it means no limit has been set.
   #--
-  # TODO: Check FS type for RLIMIT_SIZE. If FAT32, return 4 GB.
   # TODO: If the process is already part of a job, get and use that handle.
   #
   def getrlimit(resource)
     # Strictly for API compatibility (actually 4 GB on FAT32)
     if resource == RLIMIT_FSIZE
-      return ((1024**4) * 4) - (1024 * 64)
+      if get_volume_type == 'NTFS'
+        return ((1024**4) * 4) - (1024 * 64)
+      else
+        return (1024**3) * 4
+      end
     end
 
-    in_job = self.job?
+    in_job = Process.job?
 
     # Put the current process in a job if it's not already in one
     unless in_job
