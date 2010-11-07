@@ -1,11 +1,10 @@
 require 'rake'
+require 'rake/clean'
 require 'rake/testtask'
 require 'rbconfig'
 include Config
 
-task :clean do
-  Dir['*.gem'].each{ |f| File.delete(f) }
-end
+CLEAN.include('**/*.gem', '**/*.rbc')
 
 namespace :gem do
   desc 'Create the win32-process gem'
