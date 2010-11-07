@@ -173,7 +173,7 @@ module Process
 
     # Put the current process in a job if it's not already in one
     unless in_job
-      job_name = 'ruby_' + Time.now.to_s
+      job_name = 'ruby_' + Process.pid.to_s
 
       # Create a job object and add the current process to it
       handle = CreateJobObject(nil, job_name)
@@ -251,7 +251,7 @@ module Process
 
     # Put the current process in a job if it's not already in one
     unless in_job
-      job_name = 'ruby_' + Time.now.to_s
+      job_name = 'ruby_' + Process.pid.to_s
 
       # Create a job object and add the current process to it
       handle = CreateJobObject(nil, job_name)
