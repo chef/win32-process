@@ -559,29 +559,30 @@ module Process
           else
             if handle != 0
               thread_id = [0].pack('L')
-              dll       = 'kernel32'
-              eproc     = 'ExitProcess'
-                  
-              thread = CreateRemoteThread(
-                handle,
-                0,
-                0,
-                GetProcAddress(GetModuleHandle(dll), eproc),
-                0,
-                0,
-                thread_id
-              )
-                     
-              if thread
-                WaitForSingleObject(thread, 5)
-                killed_pids.push(pid)
-                @child_pids.delete(pid)
-              else
-                raise Error, get_last_error
+              begin 
+                thread = CreateRemoteThread(
+                  handle,
+                  0,
+                  0,
+                  GetProcAddress(GetModuleHandle('kernel32'), 'ExitProcess'),
+                  0,
+                  0,
+                  thread_id
+                )
+
+                if thread
+                  WaitForSingleObject(thread, 5)
+                  killed_pids.push(pid)
+                  @child_pids.delete(pid)
+                else
+                  raise Error, get_last_error
+                end
+              ensure
+                CloseHandle(thread) if thread
               end
             else
               raise Error, get_last_error
-          end
+          end # case
 
           @child_pids.delete(pid)
         end
