@@ -17,8 +17,8 @@ module Process
   class Error < RuntimeError; end
 
   # Eliminates redefinition warnings.
-  undef_method :getpriority, :kill, :getrlimit, :ppid, :setpriority
-  undef_method :wait, :wait2, :waitpid, :waitpid2, :uid
+  undef_method :getpriority, :kill, :getrlimit, :ppid, :setrlimit
+  undef_method :setpriority, :wait, :wait2, :waitpid, :waitpid2, :uid
    
   # The version of the win32-process library
   WIN32_PROCESS_VERSION = '0.6.3'
@@ -226,6 +226,23 @@ module Process
     [val, val] # Return an array of two values to comply with spec
   end
 
+  # Sets the resource limit of the current process. Only a limited number
+  # of flags are supported.
+  #
+  # Process::RLIMIT_CPU
+  # Process::RLIMIT_AS
+  # Process::RLIMIT_RSS
+  # Process::RLIMIT_VMEM
+  #
+  # The Process:RLIMIT_AS, Process::RLIMIT_RSS and Process::VMEM constants
+  # all refer to the Process memory limit. The Process::RLIMIT_CPU constant
+  # refers to the per process user time limit.
+  #
+  # The +max_limit+ parameter is provided for interface compatibility only.
+  # It is always set to the current_limit value.
+  #--
+  # TODO: Open an existing job object if already in a job.
+  #
   def setrlimit(resource, current_limit, max_limit = nil)
     max_limit = current_limit
 
