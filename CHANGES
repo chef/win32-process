@@ -1,7 +1,10 @@
 = 0.6.3 - ???
-* Added the job? method that returns whether or not the current process
+* Fixed a bug in the Process.kill method where the remote thread created
+  was not being properly closed. Thanks go to Ben Nagy for the spot.
+* Added the Process.job? method that returns whether or not the current process
   is already in a job.
-* Added the setrlimit method.
+* Added the Process.setrlimit method. Like the Process.getrlimit method it
+  only supports a limited subset of resources.
 * Rakefile tweaks.
 
 = 0.6.2 - 19-Dec-2009
