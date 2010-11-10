@@ -172,6 +172,10 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
   end
 
+  def test_getrlimit_raises_an_error_if_the_resource_is_invalid
+    assert_raise(Process::Error){ Process.getrlimit(9999) }
+  end
+
   def test_setrlimit_basic
     assert_respond_to(Process, :getrlimit)
     assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) }
@@ -183,7 +187,11 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_equal([4096, 4096], Process.getrlimit(Process::RLIMIT_VMEM))
   end
 
-  def test_job
+  def test_setrlimit_raises_an_error_if_the_resource_is_invalid
+    assert_raise(Process::Error){ Process.setrlimit(9999, 100) }
+  end
+
+  def test_is_job
     assert_respond_to(Process, :job?)
     assert_nothing_raised{ Process.job? }
     assert_boolean(Process.job?)

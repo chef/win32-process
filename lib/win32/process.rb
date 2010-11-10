@@ -200,6 +200,8 @@ module Process
           buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_TIME].pack('L')
         when RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS
           buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_MEMORY].pack('L')
+        else
+          raise Error, "unsupported resource type"
       end
 
       bool = QueryInformationJobObject(
@@ -276,6 +278,8 @@ module Process
         when RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS
           buf[16,4] = [JOB_OBJECT_LIMIT_PROCESS_MEMORY].pack('L')
           buf[96,4] = [max_limit].pack('L') # ProcessMemoryLimit
+        else
+          raise Error, "unsupported resource type"
       end
 
       bool = SetInformationJobObject(
