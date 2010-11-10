@@ -155,8 +155,6 @@ module Process
   # same.
   #
   # If [0,0] is returned then it means no limit has been set.
-  #--
-  # TODO: If the process is already part of a job, get and use that handle.
   #
   def getrlimit(resource)
     # Strictly for API compatibility (actually 4 GB on FAT32)
@@ -172,15 +170,13 @@ module Process
     in_job = Process.job?
 
     # Put the current process in a job if it's not already in one
-    unless in_job
-      job_name = 'ruby_' + Process.pid.to_s
-
-      # Create a job object and add the current process to it
-      handle = CreateJobObject(nil, job_name)
-
-      if handle == 0
-        raise Error, get_last_error
-      end
+    if in_job && defined?(@job_name)
+      handle = OpenJobObject(JOB_OBJECT_QUERY, true, @job_name)
+      raise Error, get_last_error if handle == 0
+    else
+      @job_name = 'ruby_' + Process.pid.to_s
+      handle = CreateJobObject(nil, @job_name)
+      raise Error, get_last_error if handle == 0
     end
 
     begin
@@ -220,7 +216,7 @@ module Process
           val = buf[96,4].unpack('L').first
       end
     ensure
-      CloseHandle(handle) if handle
+      at_exit{ CloseHandle(handle) if handle }
     end
 
     [val, val] # Return an array of two values to comply with spec
@@ -240,8 +236,6 @@ module Process
   #
   # The +max_limit+ parameter is provided for interface compatibility only.
   # It is always set to the current_limit value.
-  #--
-  # TODO: Open an existing job object if already in a job.
   #
   def setrlimit(resource, current_limit, max_limit = nil)
     max_limit = current_limit
@@ -250,15 +244,13 @@ module Process
     in_job = Process.job?
 
     # Put the current process in a job if it's not already in one
-    unless in_job
-      job_name = 'ruby_' + Process.pid.to_s
-
-      # Create a job object and add the current process to it
+    if in_job && defined? @job_name
+      handle = OpenJobObject(JOB_OBJECT_SET_ATTRIBUTES, true, @job_name)
+      raise Error, get_last_error if handle == 0
+    else
+      @job_name = 'ruby_' + Process.pid.to_s
       handle = CreateJobObject(nil, job_name)
-
-      if handle == 0
-        raise Error, get_last_error
-      end
+      raise Error, get_last_error if handle == 0
     end
 
     begin
@@ -292,7 +284,7 @@ module Process
         raise Error, get_last_error
       end
     ensure
-      CloseHandle(handle) if handle
+      at_exit{ CloseHandle(handle) if handle }
     end
   end
 
