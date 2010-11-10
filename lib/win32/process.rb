@@ -155,6 +155,10 @@ module Process
   # same.
   #
   # If [0,0] is returned then it means no limit has been set.
+  #
+  # Example:
+  #
+  #   Process.getrlimit(Process::RLIMIT_VMEM) # => [0, 0]
   #--
   # NOTE: Both the getrlimit and setrlimit method use an at_exit handler
   # to close a job handle. This is necessary because simply calling it
@@ -243,6 +247,11 @@ module Process
   #
   # The +max_limit+ parameter is provided for interface compatibility only.
   # It is always set to the current_limit value.
+  #
+  # Example:
+  #
+  #   Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) # => nil
+  #   Process.getrlimit(Process::RLIMIT_VMEM) # => [4096, 4096]
   #
   def setrlimit(resource, current_limit, max_limit = nil)
     max_limit = current_limit
