@@ -1,34 +1,33 @@
 = Description
-   This package provides the fork, wait, wait2, waitpid, and waitpid2 methods
-   for MS Windows. In addition, it provides a different implementation of the
-   kill method, a proper implementation of Process.ppid, and decent analogues
-   of Process.getpriority, Process.setpriority and Process.getrlimit.
+  This package provides the fork, wait, wait2, waitpid, and waitpid2 methods
+  for MS Windows. In addition, it provides a different implementation of the
+  kill method, a proper implementation of Process.ppid, and decent analogues
+  of Process.getpriority, Process.setpriority and Process.getrlimit.
 
 = Prerequisites
-   Ruby 1.8.2 or later.
-   The windows-pr library, 0.8.6 or later.
-   The sys-proctable library, 0.7.6 or later (test suite only).
-   The test-unit library, 2.0.3 or later (test suite only).
+  Ruby 1.8.2 or later.
+  The windows-pr library, 0.8.6 or later.
+  The sys-proctable library, 0.7.6 or later (test suite only).
+  The test-unit library, 2.0.3 or later (test suite only).
 
 = Supported Platforms
-   This library is supported on Windows 2000 or later.
+  This library is supported on Windows 2000 or later.
 
-= Installation Instructions
-   rake test (optional)
-   rake install (non-gem) or rake install_gem (gem)
+= Installation
+  gem install win32-process
 
 = Synopsis
-   require 'win32/process'
+  require 'win32/process'
 
-   Process.fork{
-      3.times{
-         puts 'In the child'
-         sleep 1
-      }
-   }
+  Process.fork{
+    3.times{
+      puts 'In the child'
+      sleep 1
+    }
+  }
 
-   Process.wait
-   puts 'Done'
+  Process.wait
+  puts 'Done'
 	
 = Developer's Notes
 == The Process.fork and Process.wait methods
@@ -86,33 +85,33 @@
    historical trivia, is that Ruby 1.6.x did not support Process.kill on
    Windows at all.
 	
-== Notes
-   It is unlikely you will be able to kill system processes with this module.
-   It's probably better that you don't.
+= Notes
+  It is unlikely you will be able to kill system processes with this module.
+  It's probably better that you don't.
 	
-== Known Bugs	
-   None known (though please see the +Details+ section for quirks).  Any
-   bugs should be reported on the project page at
-   http://rubyforge.org/projects/win32utils.
+= Known Bugs	
+  None known (though please see the +Details+ section for quirks).  Any
+  bugs should be reported on the project page at
+  http://rubyforge.org/projects/win32utils.
 	
-== Future Plans  
-   Train Process.fork to execute from the point of the call rather than the
-   top of the script (if possible).
+= Future Plans  
+  Train Process.fork to execute from the point of the call rather than the
+  top of the script (if possible).
 	
-   Other suggestions welcome.
+  Other suggestions welcome.
 	
-== License
-   Artistic 2.0
+= License
+  Artistic 2.0
 	
-== Copyright
-   (C) 2003-2009 Daniel J. Berger
-   All Rights Reserved
+= Copyright
+  (C) 2003-2010 Daniel J. Berger
+  All Rights Reserved
 		
-== Warranty
-   This library is provided "as is" and without any express or
-   implied warranties, including, without limitation, the implied
-   warranties of merchantability and fitness for a particular purpose.
+= Warranty
+  This library is provided "as is" and without any express or
+  implied warranties, including, without limitation, the implied
+  warranties of merchantability and fitness for a particular purpose.
 	
-== Author(s)
-   Park Heesob	
-   Daniel J. Berger
+= Author(s)
+  Park Heesob	
+  Daniel J. Berger
