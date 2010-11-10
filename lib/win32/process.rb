@@ -155,14 +155,19 @@ module Process
   # same.
   #
   # If [0,0] is returned then it means no limit has been set.
+  #--
+  # NOTE: Both the getrlimit and setrlimit method use an at_exit handler
+  # to close a job handle. This is necessary because simply calling it
+  # at the end of the block, while marking it for closure, would also make
+  # it unavailable even within the same process since it would no longer
+  # be associated with the job.
   #
   def getrlimit(resource)
-    # Strictly for API compatibility (actually 4 GB on FAT32)
     if resource == RLIMIT_FSIZE
       if get_volume_type == 'NTFS'
-        return ((1024**4) * 4) - (1024 * 64)
+        return ((1024**4) * 4) - (1024 * 64) # ~4 TB
       else
-        return (1024**3) * 4
+        return (1024**3) * 4 # 4 GB
       end
     end
 
