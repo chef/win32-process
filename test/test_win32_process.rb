@@ -166,6 +166,23 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_equal(2, Process.getrlimit(Process::RLIMIT_CPU).length)
   end
 
+  def test_getrlimit_can_be_called_multiple_times
+    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
+  end
+
+  def test_setrlimit_basic
+    assert_respond_to(Process, :getrlimit)
+    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) }
+    assert_nil(Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4))
+  end
+
+  def test_setrlimit_sets_the_resource_as_expected
+    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) }
+    assert_equal([4096, 4096], Process.getrlimit(Process::RLIMIT_VMEM))
+  end
+
   def test_job
     assert_respond_to(Process, :job?)
     assert_nothing_raised{ Process.job? }
