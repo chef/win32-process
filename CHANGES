@@ -1,3 +1,12 @@
+= 0.6.4 - 13-Nov-2010
+* Altered the wait, wait2, waitpid and waitpid2 methods to match the current
+  MRI interface, i.e. they accept and optional pid and flags, though the
+  latter is ignored. Thanks go to Robert Wahler for the spot.
+* Renamed the example scripts to avoid any potential confusion with actual
+  test scripts and cleaned them up a bit.
+* Added Rake tasks to run the example programs.
+* Updated the MANIFEST.
+
 = 0.6.3 - 9-Nov-2010
 * Fixed a bug in the Process.kill method where the remote thread created
   was not being properly closed. Thanks go to Ben Nagy for the spot.
