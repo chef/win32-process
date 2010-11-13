@@ -897,7 +897,8 @@ module Process
   #   
   def wait(pid = -1, flags = nil)
     if pid && pid >= 0
-      return waitpid(pid, flags)
+      pid, status = waitpid(pid, flags)
+      return pid
     end
 
     handles = []
@@ -959,7 +960,8 @@ module Process
   # 
   def wait2(pid = -1, flags = nil)
     if pid && pid >= 0
-      return waitpid2(pid, flags)
+      pid, status = waitpid2(pid, flags)
+      return pid
     end
 
     handles = []
