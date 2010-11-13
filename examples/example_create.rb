@@ -1,13 +1,9 @@
 ##########################################################################
-# test_create.rb
+# example_create.rb
 #
-# Simple test program for the Process.create() method.
+# Simple test program for the Process.create() method. You can run this
+# code via the 'example:create' task.
 ##########################################################################
-Dir.chdir('..') if File.basename(Dir.pwd) == 'examples'
-$LOAD_PATH.unshift Dir.pwd
-$LOAD_PATH.unshift Dir.pwd + '/lib'
-Dir.chdir('examples') rescue nil
-
 require "win32/process"
 
 p Process::WIN32_PROCESS_VERSION
