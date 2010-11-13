@@ -424,10 +424,13 @@ module Process
 
   # Waits for the given child process to exit and returns that pid.
   # 
+  # The +flags+ argument is ignored at the moment. It is provided strictly
+  # for interface compatibility.
+  #
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
   # 
-  def waitpid(pid)
+  def waitpid(pid, flags = nil)
     exit_code = [0].pack('L')
     handle = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
      
@@ -456,6 +459,9 @@ module Process
    
   # Waits for the given child process to exit and returns an array containing
   # the process id and the exit status.
+  #
+  # The +flags+ argument is ignored at the moment. It is provided strictly
+  # for interface compatibility.
   # 
   # Note that the $? (Process::Status) global variable is NOT set. This
   # may be addressed in a future release if/when possible.
@@ -463,7 +469,7 @@ module Process
   # Ruby does not provide a way to hook into $? so there's no way for us
   # to set it.
   # 
-  def waitpid2(pid)
+  def waitpid2(pid, flags = nil)
     exit_code = [0].pack('L')
     handle    = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
       
@@ -877,7 +883,11 @@ module Process
   end
    
   # Waits for any child process to exit and returns the process id of that
-  # child.
+  # child. If a pid is provided that is greater than or equal to 0, then
+  # it is the equivalent of calling Process.waitpid.
+  #
+  # The +flags+ argument is ignored at the moment. It is provided strictly
+  # for interface compatibility.
   # 
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
@@ -885,7 +895,11 @@ module Process
   # The GetProcessId() function is not defined in Windows 2000 or earlier
   # so we have to do some extra work for those platforms.
   #   
-  def wait
+  def wait(pid = -1, flags = nil)
+    if pid && pid >= 0
+      return waitpid(pid, flags)
+    end
+
     handles = []
       
     # Windows 2000 or earlier
@@ -933,6 +947,9 @@ module Process
    
   # Waits for any child process to exit and returns an array containing the
   # process id and the exit status of that child.
+  #
+  # The +flags+ argument is ignored at the moment. It is provided strictly
+  # for interface compatibility.
   # 
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
@@ -940,7 +957,11 @@ module Process
   # The GetProcessId() function is not defined in Windows 2000 or earlier
   # so we have to do some extra work for those platforms.
   # 
-  def wait2
+  def wait2(pid = -1, flags = nil)
+    if pid && pid >= 0
+      return waitpid2(pid, flags)
+    end
+
     handles = []
      
     # Windows 2000 or earlier
