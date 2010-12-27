@@ -21,7 +21,13 @@ module Process
   undef_method :setpriority, :wait, :wait2, :waitpid, :waitpid2, :uid
    
   # The version of the win32-process library
-  WIN32_PROCESS_VERSION = '0.6.4'
+  WIN32_PROCESS_VERSION = '0.6.5'
+
+  # Defined for interface compatibility, but not used
+
+  PRIO_PROCESS = 0
+  PRIO_PGRP    = 1
+  PRIO_USER    = 2
   
   include Windows::Process
   include Windows::Thread
@@ -307,10 +313,10 @@ module Process
   end
 
   # Retrieves the priority class for the specified process id +int+. Unlike
-  # the default implementation, lower values do not necessarily correspond to
-  # higher priority classes.
+  # the default implementation, lower return values do not necessarily
+  # correspond to higher priority classes.
   #
-  # The +kind+ parameter is ignored but present for API compatibility.
+  # The +kind+ parameter is ignored but required for API compatibility.
   # You can only retrieve process information, not process group or user
   # information, so it is effectively always Process::PRIO_PROCESS.
   #
@@ -323,8 +329,11 @@ module Process
   # 16384 - Process::BELOW_NORMAL_PRIORITY_CLASS
   # 32768 - Process::ABOVE_NORMAL_PRIORITY_CLASS
   # 
-  def getpriority(kind = Process::PRIO_PROCESS, int = nil)
-    raise ArgumentError unless int
+  def getpriority(kind, int)
+    raise TypeError unless kind.is_a?(Integer)
+    raise TypeError unless int.is_a?(Integer)
+
+    int = Process.pid if int == 0 # Match spec
 
     handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0 , int)
 
@@ -332,10 +341,14 @@ module Process
       raise Error, get_last_error
     end
 
-    priority_class = GetPriorityClass(handle)
+    begin
+      priority_class = GetPriorityClass(handle)
 
-    if priority_class == 0
-      raise Error, get_last_error
+      if priority_class == 0
+        raise Error, get_last_error
+      end
+    ensure
+      CloseHandle(handle)
     end
 
     priority_class
@@ -356,9 +369,12 @@ module Process
   # * Process::BELOW_NORMAL_PRIORITY_CLASS
   # * Process::ABOVE_NORMAL_PRIORITY_CLASS
   #
-  def setpriority(kind = nil, int = nil, int_priority = nil)
-    raise ArgumentError unless int
-    raise ArgumentError unless int_priority
+  def setpriority(kind, int, int_priority)
+    raise TypeError unless kind.is_a?(Integer)
+    raise TypeError unless int.is_a?(Integer)
+    raise TypeError unless int_priority.is_a?(Integer)
+
+    int = Process.pid if int == 0 # Match spec
 
     handle = OpenProcess(PROCESS_SET_INFORMATION, 0 , int)
 
@@ -366,8 +382,12 @@ module Process
       raise Error, get_last_error
     end
 
-    unless SetPriorityClass(handle, int_priority)
-      raise Error, get_last_error
+    begin
+      unless SetPriorityClass(handle, int_priority)
+        raise Error, get_last_error
+      end
+    ensure
+      CloseHandle(handle)
     end
 
     return 0 # Match the spec
@@ -383,6 +403,8 @@ module Process
   #
   def uid(sid = false)
     token = 0.chr * 4
+
+    raise TypeError unless sid.is_a?(TrueClass) || sid.is_a?(FalseClass)
 
     unless OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, token)
       raise Error, get_last_error
@@ -710,7 +732,7 @@ module Process
     args.each{ |key, val|
       key = key.to_s.downcase
       unless valid_keys.include?(key)
-        raise Error, "invalid key '#{key}'"
+        raise ArgumentError, "invalid key '#{key}'"
       end
       hash[key] = val
     }
@@ -722,7 +744,7 @@ module Process
       hash['startup_info'].each{ |key, val|
         key = key.to_s.downcase
         unless valid_si_keys.include?(key)
-          raise Error, "invalid startup_info key '#{key}'"
+          raise ArgumentError, "invalid startup_info key '#{key}'"
         end
         si_hash[key] = val
       }
@@ -735,7 +757,7 @@ module Process
         hash['command_line'] = hash['app_name']
         hash['app_name'] = nil
       else
-        raise Error, 'command_line or app_name must be specified'
+        raise ArgumentError, 'command_line or app_name must be specified'
       end
     end
       
@@ -864,7 +886,7 @@ module Process
     # TODO: Close stdin, stdout and stderr handles in the si_hash unless
     # they're pointing to one of the standard handles already. [Maybe]
     unless bool
-      raise Error, "CreateProcess() failed: ", get_last_error
+      raise Error, "CreateProcess() failed: " + get_last_error
     end
       
     # Automatically close the process and thread handles in the
