@@ -1,3 +1,15 @@
+= 0.6.5 - 27-Dec-2010
+* Fixed getpriority and setpriority so that the underlying process handle is
+  always closed. Thanks go to Rafal Michalski	for the spot and patch. 
+* Updated getpriority and setpriority so that there are no longer any
+  default arguments. This now matches the MRI spec.
+* Updated Process.create so that illegal options now raise an ArgumentError
+  instead of a Process::Error.
+* Fixed a bug in an error message in the Process.create method where the actual
+  error message was getting lost.
+* Refactored the test suite to use test-unit 2.x features, and make tests a
+  little more robust in general.
+
 = 0.6.4 - 13-Nov-2010
 * Altered the wait, wait2, waitpid and waitpid2 methods to match the current
   MRI interface, i.e. they accept and optional pid and flags, though the
