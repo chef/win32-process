@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'win32-process'
-  spec.version    = '0.6.4'
+  spec.version    = '0.6.5'
   spec.license    = 'Artistic 2.0'
   spec.authors    = ['Daniel Berger', 'Park Heesob']
   spec.email      = 'djberg96@gmail.com'
@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.rubyforge_project = 'win32utils'
   spec.extra_rdoc_files  = ['README', 'CHANGES', 'MANIFEST']
 
-  spec.add_dependency('windows-pr', '>= 1.1.0')
+  spec.add_dependency('windows-pr', '>= 1.1.2')
   spec.add_development_dependency('test-unit', '>= 2.1.1')
   spec.add_development_dependency('sys-proctable')
 

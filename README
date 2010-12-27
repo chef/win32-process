@@ -6,9 +6,9 @@
   Process.setrlimit.
 
 = Prerequisites
-  The windows-pr library, 1.1.2 or later.
-  The sys-proctable library, 0.9.0 or later (dev only).
-  The test-unit library, 2.1.1 or later (dev only).
+  * windows-pr
+  * sys-proctable (dev only)
+  * test-unit 2 (dev only)
 
 = Supported Platforms
   This library is supported on Windows 2000 or later.
