@@ -1,14 +1,14 @@
 = Description
-  This package provides the fork, wait, wait2, waitpid, and waitpid2 methods
+  This library provides the fork, wait, wait2, waitpid, and waitpid2 methods
   for MS Windows. In addition, it provides a different implementation of the
   kill method, a proper implementation of Process.ppid, and decent analogues
-  of Process.getpriority, Process.setpriority and Process.getrlimit.
+  of Process.getpriority, Process.setpriority, Process.getrlimit and
+  Process.setrlimit.
 
 = Prerequisites
-  Ruby 1.8.2 or later.
-  The windows-pr library, 0.8.6 or later.
-  The sys-proctable library, 0.7.6 or later (test suite only).
-  The test-unit library, 2.0.3 or later (test suite only).
+  The windows-pr library, 1.1.2 or later.
+  The sys-proctable library, 0.9.0 or later (dev only).
+  The test-unit library, 2.1.1 or later (dev only).
 
 = Supported Platforms
   This library is supported on Windows 2000 or later.
@@ -104,7 +104,7 @@
   Artistic 2.0
 	
 = Copyright
-  (C) 2003-2010 Daniel J. Berger
+  (C) 2003-2011 Daniel J. Berger
   All Rights Reserved
 		
 = Warranty
