@@ -8,7 +8,7 @@ CLEAN.include('**/*.gem', '**/*.rbc')
 
 namespace :gem do
   desc 'Create the win32-process gem'
-  task :create do
+  task :create => [:clean] do
     spec = eval(IO.read('win32-process.gemspec'))
     Gem::Builder.new(spec).build
   end
