@@ -124,7 +124,92 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(Process::Error){ Process.create(:app_name => "bogusapp.exe") }
     assert_raise_message(err){ Process.create(:app_name => "bogusapp.exe") }
   end
+
+  test "create passes local environment when environment is not specified" do
+    stdout_read, stdout_write = IO.pipe
+
+    ENV['AARDVARK'] = 'B'
+    assert_nothing_raised {
+      Process.create(
+        :app_name         => 'cmd.exe /c echo %AARDVARK%',
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :startup_info     => { :stdout => stdout_write }
+      )
+    }
+
+    stdout_write.close
+    assert_equal('B', stdout_read.read.chomp)
+  end
+  
+  test "create does not pass local environment when environment is specified" do
+    stdout_read, stdout_write = IO.pipe
+
+    ENV['AARDVARK'] = 'B'
+    assert_nothing_raised {
+      Process.create(
+        :app_name         => 'cmd.exe /c echo %AARDVARK%',
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :environment      => "",
+        :startup_info     => { :stdout => stdout_write }
+      )
+    }
+
+    stdout_write.close
+    assert_equal('%AARDVARK%', stdout_read.read.chomp)
+  end
+  
+  test "create supports :environment as a string" do
+    stdout_read, stdout_write = IO.pipe
+
+    assert_nothing_raised {
+      Process.create(
+        :app_name         => 'cmd.exe /c echo %A% %C%',
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :environment      => "A=B;C=D",
+        :startup_info     => { :stdout => stdout_write }
+      )
+    }
+
+    stdout_write.close
+    assert_equal("B D", stdout_read.read.chomp)
+  end
+  
+  test "create supports :environment as an array" do
+    stdout_read, stdout_write = IO.pipe
+
+    assert_nothing_raised {
+      Process.create(
+        :app_name         => 'cmd.exe /c echo %A% %C%',
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :environment      => [ "A=B;X;", "C=;D;Y" ],
+        :startup_info     => { :stdout => stdout_write }
+      )
+    }
+
+    stdout_write.close
+    assert_equal("B;X; ;D;Y", stdout_read.read.chomp)
+  end
+  
+  test "create supports empty :environment string" do
+    assert_nothing_raised {
+      Process.create(
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :app_name    => 'cmd.exe',
+        :environment => ''
+      )
+    }
+  end
    
+  test "create supports empty :environment array" do
+    assert_nothing_raised {
+      Process.create(
+        :creation_flags   => Process::DETACHED_PROCESS,
+        :app_name    => 'cmd.exe',
+        :environment => []
+      )
+    }
+  end
+  
   test "wait basic functionality" do
     assert_respond_to(Process, :wait)
   end

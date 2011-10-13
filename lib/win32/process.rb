@@ -761,16 +761,20 @@ module Process
       end
     end
       
-    # The environment string should be passed as a string of ';' separated
-    # paths.
-    if hash['environment'] 
-      env = hash['environment'].split(File::PATH_SEPARATOR) << 0.chr
-      if hash['with_logon']
-        env = env.map{ |e| multi_to_wide(e) }
-        env = [env.join("\0\0")].pack('p*').unpack('L').first            
-      else
-        env = [env.join("\0")].pack('p*').unpack('L').first
+    # The environment string should be passed as an array of A=B paths, or
+    # as a string of ';' separated paths.
+    if hash['environment']
+      env = hash['environment']
+      if !env.respond_to?(:join)
+        # Backwards compat for ; separated paths
+        env = hash['environment'].split(File::PATH_SEPARATOR)
       end
+      # The argument format is a series of null-terminated strings, with an additional null terminator.
+      env = env.map { |e| e + "\0" }.join("") + "\0"
+      if hash['with_logon']
+        env = env.multi_to_wide(e)
+      end
+      env = [env].pack('p*').unpack('L').first
     else
       env = nil
     end
