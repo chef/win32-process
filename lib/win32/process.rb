@@ -19,7 +19,7 @@ module Process
   # Eliminates redefinition warnings.
   undef_method :getpriority, :kill, :getrlimit, :ppid, :setrlimit
   undef_method :setpriority, :wait, :wait2, :waitpid, :waitpid2, :uid
-   
+
   # The version of the win32-process library
   WIN32_PROCESS_VERSION = '0.6.5'
 
@@ -28,7 +28,7 @@ module Process
   PRIO_PROCESS = 0
   PRIO_PGRP    = 1
   PRIO_USER    = 2
-  
+
   include Windows::Process
   include Windows::Thread
   include Windows::Error
@@ -53,9 +53,9 @@ module Process
   extend Windows::Unicode
   extend Windows::ToolHelper
   extend Windows::MSVCRT::String
-   
+
   # :stopdoc:
-   
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
@@ -63,7 +63,7 @@ module Process
     :process_id,
     :thread_id
   )
-   
+
   @child_pids = []  # Static variable used for Process.fork
   @i = -1           # Static variable used for Process.fork
 
@@ -75,7 +75,7 @@ module Process
     RLIMIT_RSS    = 5 # ProcessMemoryLimit
     RLIMIT_VMEM   = 5 # ProcessMemoryLimit
   end
-   
+
   # :startdoc:
 
   # Returns the process and system affinity mask for the given +pid+, or the
@@ -328,7 +328,7 @@ module Process
   # 256   - Process::REALTIME_PRIORITY_CLASS
   # 16384 - Process::BELOW_NORMAL_PRIORITY_CLASS
   # 32768 - Process::ABOVE_NORMAL_PRIORITY_CLASS
-  # 
+  #
   def getpriority(kind, int)
     raise TypeError unless kind.is_a?(Integer)
     raise TypeError unless int.is_a?(Integer)
@@ -442,27 +442,27 @@ module Process
       strcpy(sid_buf, sid_ptr.unpack('L')[0])
       sid_buf.strip.split('-').last.to_i
     end
-  end 
+  end
 
   # Waits for the given child process to exit and returns that pid.
-  # 
+  #
   # The +flags+ argument is ignored at the moment. It is provided strictly
   # for interface compatibility.
   #
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
-  # 
+  #
   def waitpid(pid, flags = nil)
     exit_code = [0].pack('L')
     handle = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
-     
+
     if handle == INVALID_HANDLE_VALUE
       raise Error, get_last_error
     end
-      
+
     # TODO: update the $? global variable (if/when possible)
     status = WaitForSingleObject(handle, INFINITE)
-      
+
     begin
       unless GetExitCodeProcess(handle, exit_code)
         raise Error, get_last_error
@@ -470,38 +470,38 @@ module Process
     ensure
       CloseHandle(handle)
     end
-      
+
     @child_pids.delete(pid)
-      
+
     # TODO: update the $? global variable (if/when possible)
     exit_code = exit_code.unpack('L').first
-      
+
     pid
   end
-   
+
   # Waits for the given child process to exit and returns an array containing
   # the process id and the exit status.
   #
   # The +flags+ argument is ignored at the moment. It is provided strictly
   # for interface compatibility.
-  # 
+  #
   # Note that the $? (Process::Status) global variable is NOT set. This
   # may be addressed in a future release if/when possible.
   #--
   # Ruby does not provide a way to hook into $? so there's no way for us
   # to set it.
-  # 
+  #
   def waitpid2(pid, flags = nil)
     exit_code = [0].pack('L')
     handle    = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
-      
+
     if handle == INVALID_HANDLE_VALUE
       raise Error, get_last_error
     end
-      
+
     # TODO: update the $? global variable (if/when possible)
     status = WaitForSingleObject(handle, INFINITE)
-    
+
     begin
       unless GetExitCodeProcess(handle, exit_code)
         raise Error, get_last_error
@@ -509,33 +509,33 @@ module Process
     ensure
       CloseHandle(handle)
     end
-      
+
     @child_pids.delete(pid)
-     
+
     # TODO: update the $? global variable (if/when possible)
     exit_code = exit_code.unpack('L').first
-    
+
     [pid, exit_code]
   end
-   
+
   # Sends the given +signal+ to an array of process id's. The +signal+ may
   # be any value from 0 to 9, or the special strings 'SIGINT' (or 'INT'),
   # 'SIGBRK' (or 'BRK') and 'SIGKILL' (or 'KILL'). An array of successfully
   # killed pids is returned.
-  # 
+  #
   # Signal 0 merely tests if the process is running without killing it.
   # Signal 2 sends a CTRL_C_EVENT to the process.
   # Signal 3 sends a CTRL_BRK_EVENT to the process.
   # Signal 9 kills the process in a harsh manner.
   # Signals 1 and 4-8 kill the process in a nice manner.
-  # 
+  #
   # SIGINT/INT corresponds to signal 2
   # SIGBRK/BRK corresponds to signal 3
   # SIGKILL/KILL corresponds to signal 9
-  # 
+  #
   # Signals 2 and 3 only affect console processes, and then only if the
   # process was created with the CREATE_NEW_PROCESS_GROUP flag.
-  # 
+  #
   def kill(signal, *pids)
     case signal
       when 'SIGINT', 'INT'
@@ -549,15 +549,15 @@ module Process
       else
         raise Error, "Invalid signal '#{signal}'"
     end
-      
+
     killed_pids = []
-      
+
     pids.each{ |pid|
       # Send the signal to the current process if the pid is zero
       if pid == 0
         pid = Process.pid
       end
-       
+
       # No need for full access if the signal is zero
       if signal == 0
         access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ
@@ -565,10 +565,10 @@ module Process
       else
         handle = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
       end
-         
+
       begin
         case signal
-          when 0   
+          when 0
             if handle != 0
               killed_pids.push(pid)
             else
@@ -590,14 +590,14 @@ module Process
           when 9
             if TerminateProcess(handle, pid)
               killed_pids.push(pid)
-              @child_pids.delete(pid)           
+              @child_pids.delete(pid)
             else
               raise Error, get_last_error
             end
           else
             if handle != 0
               thread_id = [0].pack('L')
-              begin 
+              begin
                 thread = CreateRemoteThread(
                   handle,
                   0,
@@ -620,7 +620,7 @@ module Process
               end
             else
               raise Error, get_last_error
-          end # case
+            end # case
 
           @child_pids.delete(pid)
         end
@@ -628,12 +628,12 @@ module Process
         CloseHandle(handle) unless handle == INVALID_HANDLE_VALUE
       end
     }
-      
+
     killed_pids
   end
-   
+
   # Process.create(key => value, ...) => ProcessInfo
-  # 
+  #
   # This is a wrapper for the CreateProcess() function. It executes a process,
   # returning a ProcessInfo struct. It accepts a hash as an argument.
   # There are several primary keys:
@@ -664,7 +664,7 @@ module Process
   # part of the StartupInfo struct, and are generally only meaningful for
   # GUI or console processes. See the documentation on CreateProcess()
   # and the StartupInfo struct on MSDN for more information.
-	# 	
+	#
   # * desktop
   # * title
   # * x
@@ -679,7 +679,7 @@ module Process
   # * stdin
   # * stdout
   # * stderr
-  # 
+  #
   # The relevant constants for 'creation_flags', 'sw_flags' and 'startf_flags'
   # are included in the Windows::Process, Windows::Console and Windows::Window
   # modules. These come with the windows-pr library, a prerequisite of this
@@ -690,9 +690,9 @@ module Process
   # If 'stdin', 'stdout' or 'stderr' are specified, then the +inherit+ value
   # is automatically set to true and the Process::STARTF_USESTDHANDLES flag is
   # automatically OR'd to the +startf_flags+ value.
-  # 
+  #
   # The ProcessInfo struct contains the following members:
-  # 
+  #
   # * process_handle - The handle to the newly created process.
   # * thread_handle  - The handle to the primary thread of the process.
   # * process_id     - Process ID.
@@ -709,7 +709,7 @@ module Process
     unless args.kind_of?(Hash)
       raise TypeError, 'Expecting hash-style keyword arguments'
     end
-      
+
     valid_keys = %w/
       app_name command_line inherit creation_flags cwd environment
       startup_info thread_inherit process_inherit close_handles with_logon
@@ -727,8 +727,8 @@ module Process
       'creation_flags' => 0,
       'close_handles'  => true
     }
-      
-    # Validate the keys, and convert symbols and case to lowercase strings.     
+
+    # Validate the keys, and convert symbols and case to lowercase strings.
     args.each{ |key, val|
       key = key.to_s.downcase
       unless valid_keys.include?(key)
@@ -736,9 +736,9 @@ module Process
       end
       hash[key] = val
     }
-      
+
     si_hash = {}
-      
+
     # If the startup_info key is present, validate its subkeys
     if hash['startup_info']
       hash['startup_info'].each{ |key, val|
@@ -749,7 +749,7 @@ module Process
         si_hash[key] = val
       }
     end
-      
+
     # The +command_line+ key is mandatory unless the +app_name+ key
     # is specified.
     unless hash['command_line']
@@ -760,14 +760,14 @@ module Process
         raise ArgumentError, 'command_line or app_name must be specified'
       end
     end
-      
+
     # The environment string should be passed as a string of ';' separated
     # paths.
-    if hash['environment'] 
+    if hash['environment']
       env = hash['environment'].split(File::PATH_SEPARATOR) << 0.chr
       if hash['with_logon']
         env = env.map{ |e| multi_to_wide(e) }
-        env = [env.join("\0\0")].pack('p*').unpack('L').first            
+        env = [env.join("\0\0")].pack('p*').unpack('L').first
       else
         env = [env.join("\0")].pack('p*').unpack('L').first
       end
@@ -804,7 +804,7 @@ module Process
         else
           handle = get_osfhandle(si_hash[io])
         end
-            
+
         if handle == INVALID_HANDLE_VALUE
           raise Error, get_last_error
         end
@@ -818,14 +818,14 @@ module Process
         )
 
         raise Error, get_last_error unless bool
-            
+
         si_hash[io] = handle
         si_hash['startf_flags'] ||= 0
         si_hash['startf_flags'] |= STARTF_USESTDHANDLES
         hash['inherit'] = true
       end
     }
-      
+
     # The bytes not covered here are reserved (null)
     unless si_hash.empty?
       startinfo[0,4]  = [startinfo.size].pack('L')
@@ -842,7 +842,7 @@ module Process
       startinfo[48,2] = [si_hash['sw_flags']].pack('S') if si_hash['sw_flags']
       startinfo[56,4] = [si_hash['stdin']].pack('L') if si_hash['stdin']
       startinfo[60,4] = [si_hash['stdout']].pack('L') if si_hash['stdout']
-      startinfo[64,4] = [si_hash['stderr']].pack('L') if si_hash['stderr']        
+      startinfo[64,4] = [si_hash['stderr']].pack('L') if si_hash['stderr']
     end
 
     if hash['with_logon']
@@ -852,7 +852,7 @@ module Process
       cmd    = hash['command_line'].nil? ? nil : multi_to_wide(hash['command_line'])
       cwd    = multi_to_wide(hash['cwd'])
       passwd = multi_to_wide(hash['password'])
-         
+
       hash['creation_flags'] |= CREATE_UNICODE_ENVIRONMENT
 
       bool = CreateProcessWithLogonW(
@@ -868,7 +868,7 @@ module Process
         startinfo,              # Startup Info
         procinfo                # Process Info
       )
-    else     
+    else
       bool = CreateProcess(
         hash['app_name'],       # App name
         hash['command_line'],   # Command line
@@ -881,21 +881,21 @@ module Process
         startinfo,              # Startup Info
         procinfo                # Process Info
       )
-    end      
-      
+    end
+
     # TODO: Close stdin, stdout and stderr handles in the si_hash unless
     # they're pointing to one of the standard handles already. [Maybe]
     unless bool
       raise Error, "CreateProcess() failed: " + get_last_error
     end
-      
+
     # Automatically close the process and thread handles in the
     # PROCESS_INFORMATION struct unless explicitly told not to.
     if hash['close_handles']
       CloseHandle(procinfo[0,4].unpack('L').first)
       CloseHandle(procinfo[4,4].unpack('L').first)
-    end      
-      
+    end
+
     ProcessInfo.new(
       procinfo[0,4].unpack('L').first, # hProcess
       procinfo[4,4].unpack('L').first, # hThread
@@ -903,20 +903,20 @@ module Process
       procinfo[12,4].unpack('L').first # hThreadId
     )
   end
-   
+
   # Waits for any child process to exit and returns the process id of that
   # child. If a pid is provided that is greater than or equal to 0, then
   # it is the equivalent of calling Process.waitpid.
   #
   # The +flags+ argument is ignored at the moment. It is provided strictly
   # for interface compatibility.
-  # 
+  #
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
   #--
   # The GetProcessId() function is not defined in Windows 2000 or earlier
   # so we have to do some extra work for those platforms.
-  #   
+  #
   def wait(pid = -1, flags = nil)
     if pid && pid >= 0
       pid, status = waitpid(pid, flags)
@@ -924,62 +924,62 @@ module Process
     end
 
     handles = []
-      
+
     # Windows 2000 or earlier
     unless defined? GetProcessId
       pids = []
     end
-      
-    @child_pids.each_with_index{ |pid, i|
-      handles[i] = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
-       
+
+    @child_pids.each_with_index{ |lpid, i|
+      handles[i] = OpenProcess(PROCESS_ALL_ACCESS, 0, lpid)
+
       if handles[i] == INVALID_HANDLE_VALUE
-        err = "unable to get HANDLE on process associated with pid #{pid}"
+        err = "unable to get HANDLE on process associated with pid #{lpid}"
         raise Error, err
       end
-         
+
       unless defined? GetProcessId
-        pids[i] = pid
-      end      
+        pids[i] = lpid
+      end
     }
-    
+
     wait = WaitForMultipleObjects(
       handles.size,
       handles.pack('L*'),
       0,
       INFINITE
     )
-      
+
     if wait >= WAIT_OBJECT_0 && wait <= WAIT_OBJECT_0 + @child_pids.size - 1
-      index = wait - WAIT_OBJECT_0         
+      index = wait - WAIT_OBJECT_0
       handle = handles[index]
-         
+
       if defined? GetProcessId
         pid = GetProcessId(handle)
       else
         pid = pids[index]
       end
-         
+
       @child_pids.delete(pid)
-      handles.each{ |handle| CloseHandle(handle) }
+      handles.each{ |h| CloseHandle(h) }
       return pid
     end
-      
+
     nil
   end
-   
+
   # Waits for any child process to exit and returns an array containing the
   # process id and the exit status of that child.
   #
   # The +flags+ argument is ignored at the moment. It is provided strictly
   # for interface compatibility.
-  # 
+  #
   # Note that the $? (Process::Status) global variable is NOT set.  This
   # may be addressed in a future release.
   #--
   # The GetProcessId() function is not defined in Windows 2000 or earlier
   # so we have to do some extra work for those platforms.
-  # 
+  #
   def wait2(pid = -1, flags = nil)
     if pid && pid >= 0
       pid, status = waitpid2(pid, flags)
@@ -987,54 +987,54 @@ module Process
     end
 
     handles = []
-     
+
     # Windows 2000 or earlier
     unless defined? GetProcessId
       pids = []
     end
-      
-    @child_pids.each_with_index{ |pid, i|
-      handles[i] = OpenProcess(PROCESS_ALL_ACCESS, 0, pid)
-        
+
+    @child_pids.each_with_index{ |lpid, i|
+      handles[i] = OpenProcess(PROCESS_ALL_ACCESS, 0, lpid)
+
       if handles[i] == INVALID_HANDLE_VALUE
-        err = "unable to get HANDLE on process associated with pid #{pid}"
+        err = "unable to get HANDLE on process associated with pid #{lpid}"
         raise Error, err
       end
-        
+
       unless defined? GetProcessId
-        pids[i] = pid
-      end      
+        pids[i] = lpid
+      end
     }
-    
+
     wait = WaitForMultipleObjects(
       handles.size,
       handles.pack('L*'),
       0,
       INFINITE
     )
-      
+
     if wait >= WAIT_OBJECT_0 && wait <= WAIT_OBJECT_0 + @child_pids.size - 1
-      index = wait - WAIT_OBJECT_0         
+      index = wait - WAIT_OBJECT_0
       handle = handles[index]
-        
+
       if defined? GetProcessId
         pid = GetProcessId(handle)
       else
         pid = pids[index]
       end
-         
+
       exit_code = [0].pack('l')
 
       unless GetExitCodeProcess(handle, exit_code)
         raise get_last_error
       end
-         
+
       @child_pids.delete(pid)
-         
-      handles.each{ |handle| CloseHandle(handle) }
+
+      handles.each{ |h| CloseHandle(h) }
       return [pid, exit_code.unpack('l').first]
     end
-      
+
     nil
   end
 
@@ -1055,8 +1055,8 @@ module Process
 
     proc_entry = 0.chr * 296 # 36 + 260
     proc_entry[0, 4] = [proc_entry.size].pack('L') # Set dwSize member
-      
-    begin             
+
+    begin
       unless Process32First(handle, proc_entry)
         error = get_last_error
         raise Error, error
@@ -1082,10 +1082,10 @@ module Process
   #
   # WARNING: This implementation should be considered experimental. It is
   # not recommended for production use.
-  # 
+  #
   def fork
     last_arg = ARGV.last
-      
+
     # Look for the 'child#xxx' tag
     if last_arg =~ /child#\d+/
       @i += 1
@@ -1106,29 +1106,29 @@ module Process
         return false
       end
     end
-   
+
     # Tag the command with the word 'child#xxx' to distinguish it
     # from the calling process.
     cmd = 'ruby -I "' + $LOAD_PATH.join(File::PATH_SEPARATOR) << '" "'
     cmd << File.expand_path($PROGRAM_NAME) << '" ' << ARGV.join(' ')
     cmd << ' child#' << @child_pids.length.to_s
-      
+
     startinfo = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     startinfo = startinfo.pack('LLLLLLLLLLLLSSLLLL')
     procinfo  = [0,0,0,0].pack('LLLL')
-      
+
     rv = CreateProcess(0, cmd, 0, 0, 1, 0, 0, 0, startinfo, procinfo)
-      
+
     if rv == 0
       raise Error, get_last_error
     end
-      
+
     pid = procinfo[8,4].unpack('L').first
     @child_pids.push(pid)
-      
-    pid 
+
+    pid
   end
-   
+
   module_function :create, :fork, :get_affinity, :getrlimit, :getpriority
   module_function :job?, :kill, :ppid, :setpriority, :setrlimit
   module_function :wait, :wait2, :waitpid, :waitpid2, :uid
