@@ -6,7 +6,9 @@ module Process
   extend Process::Functions
 
   def getpriority(kind, int)
-    int = Process.pid if int == 0 # Match spec
+    raise TypeError, kind unless kind.is_a?(Fixnum) # Match spec
+    raise TypeError, int unless int.is_a?(Fixnum)   # Match spec
+    int = Process.pid if int == 0                   # Match spec
 
     handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, int)
 
@@ -23,9 +25,9 @@ module Process
     ensure
       CloseHandle(handle)
     end
+
+    priority
   end
 
   module_function :getpriority
 end
-
-p Process.getpriority(nil, Process.pid)

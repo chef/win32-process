@@ -11,5 +11,5 @@ module Process::Constants
   INVALID_HANDLE_VALUE = 0xffffffff
 
   # Process Access Rights
-  PROCESS_QUERY_INFORMATION = 0x04000000
+  PROCESS_QUERY_INFORMATION = 0x00000400
 end
