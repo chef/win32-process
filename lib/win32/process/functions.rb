@@ -13,6 +13,9 @@ module Process::Functions
   attach_function :OpenProcess, [:ulong, :bool, :ulong], :ulong
   attach_function :SetPriorityClass, [:ulong, :ulong], :bool
 
+  attach_function :GetVolumeInformationA,
+    [:string, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong], :bool
+
   ffi_lib :advapi32
 
   attach_function :ConvertSidToStringSidA, [:buffer_in, :pointer], :bool

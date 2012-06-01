@@ -135,6 +135,14 @@ module Process
     end
   end
 
+  private
+
+  def get_volume_type
+    buf = FFI::MemoryPointer.new(:char, 32)
+    bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)
+    bool ? buf.read_string : nil
+  end
+
   # TODO: Ruby 1.9.3 is giving me redefinition warnings. Why?
   module_function :getpriority
   module_function :setpriority
