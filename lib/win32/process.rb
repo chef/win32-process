@@ -5,6 +5,8 @@ module Process
   include Process::Constants
   extend Process::Functions
 
+  WIN32_PROCESS_VERSION = '0.7.0'
+
   def job?
     pbool = FFI::MemoryPointer.new(:int)
     IsProcessInJob(GetCurrentProcess(), nil, pbool)
@@ -38,6 +40,8 @@ module Process
     [pmask.read_long, smask.read_long]
   end
 
+  remove_method :getpriority
+
   def getpriority(kind, int)
     raise TypeError, kind unless kind.is_a?(Fixnum) # Match spec
     raise TypeError, int unless int.is_a?(Fixnum)   # Match spec
@@ -62,9 +66,8 @@ module Process
     priority
   end
 
+  # TODO: Ruby 1.9.3 is giving me redefinition warnings. Why?
   module_function :getpriority
   module_function :get_affinity
   module_function :job?
 end
-
-p Process.job?
