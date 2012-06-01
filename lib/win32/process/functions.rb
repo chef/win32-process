@@ -9,5 +9,6 @@ module Process::Functions
   attach_function :GetCurrentProcess, [], :ulong
   attach_function :GetProcessAffinityMask, [:ulong, :pointer, :pointer], :bool
   attach_function :GetPriorityClass, [:ulong], :ulong
+  attach_function :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_function :OpenProcess, [:ulong, :bool, :ulong], :ulong
 end

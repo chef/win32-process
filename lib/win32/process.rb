@@ -5,6 +5,12 @@ module Process
   include Process::Constants
   extend Process::Functions
 
+  def job?
+    pbool = FFI::MemoryPointer.new(:int)
+    IsProcessInJob(GetCurrentProcess(), nil, pbool)
+    pbool.read_int == 1 ? true : false
+  end
+
   def get_affinity(int = Process.pid)
     pmask = FFI::MemoryPointer.new(:ulong)
     smask = FFI::MemoryPointer.new(:ulong)
@@ -58,4 +64,7 @@ module Process
 
   module_function :getpriority
   module_function :get_affinity
+  module_function :job?
 end
+
+p Process.job?
