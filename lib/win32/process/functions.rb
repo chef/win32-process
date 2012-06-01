@@ -11,4 +11,5 @@ module Process::Functions
   attach_function :GetPriorityClass, [:ulong], :ulong
   attach_function :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_function :OpenProcess, [:ulong, :bool, :ulong], :ulong
+  attach_function :SetPriorityClass, [:ulong, :ulong], :bool
 end

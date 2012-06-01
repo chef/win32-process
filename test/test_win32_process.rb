@@ -17,7 +17,7 @@ require 'sys/proctable'
 
 class TC_Win32Process < Test::Unit::TestCase
   def setup
-    @priority = Process::NORMAL_PRIORITY_CLASS
+    @priority = Process::BELOW_NORMAL_PRIORITY_CLASS
   end
 
   test "win32-process version is set to the correct value" do
@@ -114,10 +114,10 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(TypeError){ Process.getpriority(Process::PRIO_PROCESS, 'test') }
   end
 
-=begin
   test "setpriority basic functionality" do
     assert_respond_to(Process, :setpriority)
     assert_nothing_raised{ Process.setpriority(0, Process.pid, @priority) }
+    assert_equal(@priority, Process.getpriority(0, Process.pid))
   end
 
   test "setpriority returns zero on success" do
@@ -140,6 +140,7 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(TypeError){ Process.setpriority(0, 0, 'test') }
   end
 
+=begin
   test "custom creation constants are defined" do
     assert_not_nil(Process::CREATE_DEFAULT_ERROR_MODE)
     assert_not_nil(Process::CREATE_NEW_CONSOLE)

@@ -11,10 +11,18 @@ module Process::Constants
   INVALID_HANDLE_VALUE = 0xffffffff
 
   # Process Access Rights
+  PROCESS_SET_INFORMATION   = 0x00000200
   PROCESS_QUERY_INFORMATION = 0x00000400
 
   # Define these for Windows
   PRIO_PROCESS = 0
   PRIO_PGRP    = 1
   PRIO_USER    = 2
+
+  # Define these for Windows
+  RLIMIT_CPU    = 0 # PerProcessUserTimeLimit
+  RLIMIT_FSIZE  = 1 # Hard coded at 4TB - 64K (assumes NTFS)
+  RLIMIT_AS     = 5 # ProcessMemoryLimit
+  RLIMIT_RSS    = 5 # ProcessMemoryLimit
+  RLIMIT_VMEM   = 5 # ProcessMemoryLimit
 end

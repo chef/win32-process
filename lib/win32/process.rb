@@ -66,8 +66,34 @@ module Process
     priority
   end
 
+  remove_method :setpriority
+
+  def setpriority(kind, int, int_priority)
+    raise TypeError unless kind.is_a?(Integer)          # Match spec
+    raise TypeError unless int.is_a?(Integer)           # Match spec
+    raise TypeError unless int_priority.is_a?(Integer)  # Match spec
+    int = Process.pid if int == 0                       # Match spec
+
+    handle = OpenProcess(PROCESS_SET_INFORMATION, false , int)
+
+    if handle == INVALID_HANDLE_VALUE
+      raise SystemCallError, FFI.errno, "OpenProcess"
+    end
+
+    begin
+      unless SetPriorityClass(handle, int_priority)
+        raise SystemCallError, FFI.errno, "SetPriorityClass"
+      end
+    ensure
+      CloseHandle(handle)
+    end
+
+    return 0 # Match the spec
+  end
+
   # TODO: Ruby 1.9.3 is giving me redefinition warnings. Why?
   module_function :getpriority
+  module_function :setpriority
   module_function :get_affinity
   module_function :job?
 end
