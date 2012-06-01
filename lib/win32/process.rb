@@ -37,7 +37,7 @@ module Process
       end
     end
 
-    [pmask.read_long, smask.read_long]
+    [pmask.read_ulong, smask.read_ulong]
   end
 
   remove_method :getpriority
@@ -91,9 +91,54 @@ module Process
     return 0 # Match the spec
   end
 
+  remove_method :uid
+
+  def uid(sid = false)
+    token = FFI::MemoryPointer.new(:ulong)
+
+    raise TypeError unless sid.is_a?(TrueClass) || sid.is_a?(FalseClass)
+
+    unless OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, token)
+      raise SystemCallError, FFI.errno, "OpenProcessToken"
+    end
+
+    token   = token.read_ulong
+    rlength = FFI::MemoryPointer.new(:ulong)
+    tuser   = 0.chr * 512
+
+    bool = GetTokenInformation(
+      token,
+      TokenUser,
+      tuser,
+      tuser.size,
+      rlength
+    )
+
+    unless bool
+      raise SystemCallError, FFI.errno, "GetTokenInformation"
+    end
+
+    string_sid = tuser[8, (rlength.read_ulong - 8)]
+
+    if sid
+      string_sid
+    else
+      psid = FFI::MemoryPointer.new(:ulong)
+
+      unless ConvertSidToStringSidA(string_sid, psid)
+        raise SystemCallError, FFI.errno, "ConvertSidToStringSid"
+      end
+
+      buf = 0.chr * 80
+      strcpy(buf, psid.read_ulong)
+      buf.strip.split('-').last.to_i
+    end
+  end
+
   # TODO: Ruby 1.9.3 is giving me redefinition warnings. Why?
   module_function :getpriority
   module_function :setpriority
   module_function :get_affinity
   module_function :job?
+  module_function :uid
 end

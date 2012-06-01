@@ -12,4 +12,14 @@ module Process::Functions
   attach_function :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_function :OpenProcess, [:ulong, :bool, :ulong], :ulong
   attach_function :SetPriorityClass, [:ulong, :ulong], :bool
+
+  ffi_lib :advapi32
+
+  attach_function :ConvertSidToStringSidA, [:buffer_in, :pointer], :bool
+  attach_function :GetTokenInformation, [:ulong, :int, :pointer, :ulong, :pointer], :bool
+  attach_function :OpenProcessToken, [:ulong, :ulong, :pointer], :bool
+
+  ffi_lib FFI::Library::LIBC
+
+  attach_function :strcpy, [:buffer_in, :ulong], :string
 end

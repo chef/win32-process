@@ -14,6 +14,10 @@ module Process::Constants
   PROCESS_SET_INFORMATION   = 0x00000200
   PROCESS_QUERY_INFORMATION = 0x00000400
 
+  # Security
+  TokenUser   = 1
+  TOKEN_QUERY = 0x00000008
+
   # Define these for Windows
   PRIO_PROCESS = 0
   PRIO_PGRP    = 1
