@@ -70,7 +70,6 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 =end
 
-=begin
   test "uid basic functionality" do
     assert_respond_to(Process, :uid)
     assert_kind_of(Fixnum, Process.uid)
@@ -92,7 +91,6 @@ class TC_Win32Process < Test::Unit::TestCase
   test "argument to uid must be a boolean" do
     assert_raise(TypeError){ Process.uid('test') }
   end
-=end
 
   test "getpriority basic functionality" do
     assert_respond_to(Process, :getpriority)
