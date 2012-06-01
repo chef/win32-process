@@ -12,4 +12,9 @@ module Process::Constants
 
   # Process Access Rights
   PROCESS_QUERY_INFORMATION = 0x00000400
+
+  # Define these for Windows
+  PRIO_PROCESS = 0
+  PRIO_PGRP    = 1
+  PRIO_USER    = 2
 end
