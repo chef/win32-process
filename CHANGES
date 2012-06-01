@@ -1,3 +1,12 @@
+= 0.7.0 - ???
+* Converted to use FFI instead of win32-api.
+* Now requires Ruby 1.9.x or later.
+* Removed the experimental Process.fork function. This obviated the necessity
+  of custom implementations of other methods, like Process.waitpid, so those
+  no longer have custom implementations either. These also proved to be
+  somewhat problematic with Ruby 1.9.x anyway.
+* Removed the custom Process.ppid method because Ruby 1.9.x now supports it.
+
 = 0.6.5 - 27-Dec-2010
 * Fixed getpriority and setpriority so that the underlying process handle is
   always closed. Thanks go to Rafal Michalski	for the spot and patch. 
