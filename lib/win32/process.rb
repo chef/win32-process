@@ -1,8 +1,10 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'functions')
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constants')
+require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
 
 module Process
   include Process::Constants
+  include Process::Structs
   extend Process::Functions
 
   WIN32_PROCESS_VERSION = '0.7.0'
@@ -135,9 +137,79 @@ module Process
     end
   end
 
+  remove_method :getrlimit
+
+  def getrlimit(resource)
+    if resource == RLIMIT_FSIZE
+      if volume_type == 'NTFS'
+        return ((1024**4) * 4) - (1024 * 64) # ~ 4TB
+      else
+        return (1024**3) * 4 # 4 GB
+      end
+    end
+
+    handle = nil
+    in_job = Process.job?
+
+    # Put the current process in a job if it's not already in one
+    if in_job && defined?(@win32_process_job_name)
+      handle = OpenJobObjectA(JOB_OBJECT_QUERY, true, @win32_process_job_name)
+      raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
+    else
+      @win32_process_job_name = 'ruby_' + Process.pid.to_s
+      handle = CreateJobObjectA(nil, @win32_process_job_name)
+      raise SystemCallError, FFI.errno, "CreateJobObject" if handle == 0
+    end
+
+    begin
+      unless in_job
+        unless AssignProcessToJobObject(handle, GetCurrentProcess())
+          raise Error, get_last_error
+        end
+      end
+
+      ptr = JOBJECT_EXTENDED_LIMIT_INFORMATION.new
+      val = nil
+
+      # Set the LimitFlags member of the struct
+      case resource
+        when RLIMIT_CPU
+          ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_TIME
+        when RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS
+          ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_MEMORY
+        else
+          raise ArgumentError, "unsupported resource type: '#{resource}'"
+      end
+
+      bool = QueryInformationJobObject(
+        handle,
+        JobObjectExtendedLimitInformation,
+        ptr,
+        ptr.size,
+        nil
+      )
+
+      unless bool
+        raise SystemCallError, FFI.errno, "QueryInformationJobObject"
+      end
+
+      case resource
+        when Process::RLIMIT_CPU
+          val = ptr[:BasicLimitInformation][:PerProcessUserTimeLimit][:QuadPart]
+        when RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS
+          val = ptr[:ProcessMemoryLimit]
+      end
+
+    ensure
+      at_exit{ CloseHandle(handle) if handle }
+    end
+
+    [val, val]
+  end
+
   private
 
-  def get_volume_type
+  def volume_type
     buf = FFI::MemoryPointer.new(:char, 32)
     bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)
     bool ? buf.read_string : nil
@@ -146,6 +218,7 @@ module Process
   # TODO: Ruby 1.9.3 is giving me redefinition warnings. Why?
   module_function :getpriority
   module_function :setpriority
+  module_function :getrlimit
   module_function :get_affinity
   module_function :job?
   module_function :uid

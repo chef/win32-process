@@ -16,6 +16,11 @@ module Process::Functions
   attach_function :GetVolumeInformationA,
     [:string, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong], :bool
 
+  attach_function :AssignProcessToJobObject, [:ulong, :ulong], :bool
+  attach_function :CreateJobObjectA, [:pointer, :string], :ulong
+  attach_function :OpenJobObjectA, [:ulong, :bool, :string], :ulong
+  attach_function :QueryInformationJobObject, [:ulong, :int, :pointer, :ulong, :pointer], :bool
+
   ffi_lib :advapi32
 
   attach_function :ConvertSidToStringSidA, [:buffer_in, :pointer], :bool

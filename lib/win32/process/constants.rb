@@ -29,4 +29,10 @@ module Process::Constants
   RLIMIT_AS     = 5 # ProcessMemoryLimit
   RLIMIT_RSS    = 5 # ProcessMemoryLimit
   RLIMIT_VMEM   = 5 # ProcessMemoryLimit
+
+  # Job constants
+  JOB_OBJECT_QUERY                = 0x00000004
+  JOB_OBJECT_LIMIT_PROCESS_TIME   = 0x00000002
+  JOB_OBJECT_LIMIT_PROCESS_MEMORY = 0x00000100
+  JobObjectExtendedLimitInformation = 9
 end
