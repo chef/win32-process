@@ -20,6 +20,7 @@ module Process::Functions
   attach_function :CreateJobObjectA, [:pointer, :string], :ulong
   attach_function :OpenJobObjectA, [:ulong, :bool, :string], :ulong
   attach_function :QueryInformationJobObject, [:ulong, :int, :pointer, :ulong, :pointer], :bool
+  attach_function :SetInformationJobObject, [:ulong, :int, :pointer, :ulong], :bool
 
   ffi_lib :advapi32
 
