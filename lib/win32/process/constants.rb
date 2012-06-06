@@ -1,4 +1,6 @@
 module Process::Constants
+  private
+
   # Priority constants
   ABOVE_NORMAL_PRIORITY_CLASS = 0x0008000
   BELOW_NORMAL_PRIORITY_CLASS = 0x0004000

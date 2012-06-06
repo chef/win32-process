@@ -3,6 +3,8 @@ require 'ffi'
 module Process::Structs
   extend FFI::Library
 
+  private
+
   # sizeof(LARGE_INTEGER) == 8
   class LARGE_INTEGER < FFI::Union
     layout(:QuadPart, :long_long)
