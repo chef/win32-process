@@ -212,6 +212,8 @@ module Process
       [val, val]
     end
 
+    remove_method :setrlimit
+
     def setrlimit(resource, current_limit, max_limit = nil)
       max_limit = current_limit
 
