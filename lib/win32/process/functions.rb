@@ -16,6 +16,14 @@ module Process::Functions
   attach_function :GetVolumeInformationA,
     [:string, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong], :bool
 
+  attach_function :CreateProcessA,
+    [:string, :buffer_in, :pointer, :pointer, :bool,
+     :ulong, :string, :string, :pointer, :pointer], :bool
+
+  attach_function :CreateProcessW,
+    [:buffer_in, :buffer_in, :pointer, :pointer, :bool,
+     :ulong, :buffer_in, :buffer_in, :pointer, :pointer], :bool
+
   attach_function :AssignProcessToJobObject, [:ulong, :ulong], :bool
   attach_function :CreateJobObjectA, [:pointer, :string], :ulong
   attach_function :OpenJobObjectA, [:ulong, :bool, :string], :ulong
@@ -28,7 +36,12 @@ module Process::Functions
   attach_function :GetTokenInformation, [:ulong, :int, :pointer, :ulong, :pointer], :bool
   attach_function :OpenProcessToken, [:ulong, :ulong, :pointer], :bool
 
+  attach_function :CreateProcessWithLogonW,
+    [:buffer_in, :buffer_in, :buffer_in, :ulong, :buffer_in, :buffer_in,
+     :ulong, :buffer_in, :buffer_in, :pointer, :pointer], :bool
+
   ffi_lib FFI::Library::LIBC
 
   attach_function :strcpy, [:buffer_in, :ulong], :string
+  attach_function :get_osfhandle, :_get_osfhandle, [:int], :ulong
 end

@@ -44,4 +44,20 @@ module Process::Structs
       :PeakJobMemoryUsed, :size_t
     )
   end
+
+  class SECURITY_ATTRIBUTES < FFI::Struct
+    layout(
+      :nLength, :ulong,
+      :lpSecurityDescriptor, :pointer,
+      :bInheritHandle, :bool
+    )
+  end
+
+  # Used by Process.create
+  ProcessInfo = Struct.new("ProcessInfo",
+    :process_handle,
+    :thread_handle,
+    :process_id,
+    :thread_id
+  )
 end
