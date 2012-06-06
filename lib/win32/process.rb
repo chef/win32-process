@@ -240,7 +240,7 @@ module Process
       # Set the LimitFlags and relevant members of the struct
       if resource == RLIMIT_CPU
         ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_TIME
-        ptr[:BasicLimitInformation][:PerProcessUserTimeLimit] = max_limit
+        ptr[:BasicLimitInformation][:PerProcessUserTimeLimit][:QuadPart] = max_limit
       else
         ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_MEMORY
         ptr[:ProcessMemoryLimit] = max_limit
