@@ -152,6 +152,7 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_not_nil(Process::DEBUG_PROCESS)
     assert_not_nil(Process::DETACHED_PROCESS)
   end
+=end
 
   test "getrlimit basic functionality" do
     assert_respond_to(Process, :getrlimit)
@@ -171,7 +172,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "getrlimit requires a valid resource value" do
-    assert_raise(Process::Error){ Process.getrlimit(9999) }
+    assert_raise(ArgumentError){ Process.getrlimit(9999) }
   end
 
   test "setrlimit basic functionality" do
@@ -189,9 +190,8 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "setrlimit raises an error if the resource value is invalid" do
-    assert_raise(Process::Error){ Process.setrlimit(9999, 100) }
+    assert_raise(ArgumentError){ Process.setrlimit(9999, 100) }
   end
-=end
 
   test "is_job basic functionality" do
     assert_respond_to(Process, :job?)

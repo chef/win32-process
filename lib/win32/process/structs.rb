@@ -3,14 +3,12 @@ require 'ffi'
 module Process::Structs
   extend FFI::Library
 
+  # sizeof(LARGE_INTEGER) == 8
   class LARGE_INTEGER < FFI::Union
-    layout(
-      :LowPart, :ulong,
-      :HighPart, :long,
-      :QuadPart, :long_long
-    )
+    layout(:QuadPart, :long_long)
   end
 
+  # sizeof(IO_COUNTERS) == 48
   class IO_COUNTERS < FFI::Struct
     layout(
       :ReadOperationCount, :ulong_long,

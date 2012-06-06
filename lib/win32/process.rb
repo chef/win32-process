@@ -207,6 +207,60 @@ module Process
     [val, val]
   end
 
+  def setrlimit(resource, current_limit, max_limit = nil)
+    max_limit = current_limit
+
+    handle = nil
+    in_job = Process.job?
+
+    unless [RLIMIT_AS, RLIMIT_VMEM, RLIMIT_RSS, RLIMIT_CPU].include?(resource)
+      raise ArgumentError, "unsupported resource type: '#{resource}'"
+    end
+
+    # Put the current process in a job if it's not already in one
+    if in_job && defined? @win32_process_job_name
+      handle = OpenJobObjectA(JOB_OBJECT_SET_ATTRIBUTES, true, @win32_process_job_name)
+      raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
+    else
+      @job_name = 'ruby_' + Process.pid.to_s
+      handle = CreateJobObjectA(nil, job_name)
+      raise SystemCallError, FFI.errno, "CreateJobObject" if handle == 0
+    end
+
+    begin
+      unless in_job
+        unless AssignProcessToJobObject(handle, GetCurrentProcess())
+          raise SystemCallError, FFI.errno, "AssignProcessToJobObject"
+        end
+      end
+
+      # sizeof(struct JOBJECT_EXTENDED_LIMIT_INFORMATION)
+      ptr = JOBJECT_EXTENDED_LIMIT_INFORMATION.new
+
+      # Set the LimitFlags and relevant members of the struct
+      if resource == RLIMIT_CPU
+        ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_TIME
+        ptr[:BasicLimitInformation][:PerProcessUserTimeLimit] = max_limit
+      else
+        ptr[:BasicLimitInformation][:LimitFlags] = JOB_OBJECT_LIMIT_PROCESS_MEMORY
+        ptr[:ProcessMemoryLimit] = max_limit
+      end
+
+      bool = SetInformationJobObject(
+        handle,
+        JobObjectExtendedLimitInformation,
+        ptr,
+        ptr.size
+      )
+
+      unless bool
+        raise SystemCallError, FFI.errno, "SetInformationJobObject"
+      end
+    ensure
+      at_exit{ CloseHandle(handle) if handle }
+    end
+  end
+
   private
 
   def volume_type
@@ -219,6 +273,7 @@ module Process
   module_function :getpriority
   module_function :setpriority
   module_function :getrlimit
+  module_function :setrlimit
   module_function :get_affinity
   module_function :job?
   module_function :uid
