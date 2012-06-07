@@ -136,9 +136,7 @@ module Process
           raise SystemCallError, FFI.errno, "ConvertSidToStringSid"
         end
 
-        buf = 0.chr * 80
-        strcpy(buf, psid.read_ulong)
-        buf.strip.split('-').last.to_i
+        psid.read_pointer.read_string.split('-').last.to_i
       end
     end
 

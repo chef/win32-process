@@ -1,3 +1,8 @@
+if RUBY_PLATFORM == 'java'
+  require 'rubygems'
+  gem 'ffi'
+end
+
 require 'ffi'
 
 module Process::Structs

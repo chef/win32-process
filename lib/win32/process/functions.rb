@@ -1,3 +1,8 @@
+if RUBY_PLATFORM == 'java'
+  require 'rubygems'
+  gem 'ffi'
+end
+
 require 'ffi'
 
 module Process::Functions
@@ -43,6 +48,5 @@ module Process::Functions
 
   ffi_lib FFI::Library::LIBC
 
-  attach_function :strcpy, [:buffer_in, :ulong], :string
   attach_function :get_osfhandle, :_get_osfhandle, [:int], :ulong
 end
