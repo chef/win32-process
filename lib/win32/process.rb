@@ -328,13 +328,14 @@ module Process
 
       # The env string should be passed as a string of ';' separated paths.
       if hash['environment']
-        env = hash['environment'].split(File::PATH_SEPARATOR) << 0.chr
+        env = hash['environment']
 
-        if hash['with_logon']
-          env = env.map{ |e| e.encode('UTF-16LE') }
+        unless env.respond_to?(:join)
+          env = hash['environment'].split(File::PATH_SEPARATOR)
         end
 
-        env = env.join("\0")
+        env = env.map{ |e| e + 0.chr }.join('') + 0.chr
+        env.encode!('UTF-16LE') if hash['with_logon']
       end
 
       # Process SECURITY_ATTRIBUTE structure
