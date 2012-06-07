@@ -38,4 +38,7 @@ module Process::Constants
   JOB_OBJECT_LIMIT_PROCESS_TIME   = 0x00000002
   JOB_OBJECT_LIMIT_PROCESS_MEMORY = 0x00000100
   JobObjectExtendedLimitInformation = 9
+
+  # Miscellaneous
+  HANDLE_FLAG_INHERIT = 0x00000001
 end

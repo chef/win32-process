@@ -55,6 +55,39 @@ module Process::Structs
     )
   end
 
+  # sizeof(STARTUPINFO) == 68
+  class STARTUPINFO < FFI::Struct
+    layout(
+      :cb, :ulong,
+      :lpReserve, :string,
+      :lpDesktop, :string,
+      :lpTitle, :string,
+      :dwX, :ulong,
+      :dwY, :ulong,
+      :dwXSize, :ulong,
+      :dwYSize, :ulong,
+      :dwXCountChars, :ulong,
+      :dwYCountChars, :ulong,
+      :dwFillAttribute, :ulong,
+      :dwFlags, :ulong,
+      :wShowWindows, :short,
+      :cbReserved2, :short,
+      :lpReserved2, :pointer,
+      :hStdInput, :ulong,
+      :hStdOutput, :ulong,
+      :hStdError, :ulong
+    )
+  end
+
+  class PROCESS_INFORMATION < FFI::Struct
+    layout(
+      :hProcess, :ulong,
+      :hThread, :ulong,
+      :dwProcessId, :ulong,
+      :dwThreadId, :ulong
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
