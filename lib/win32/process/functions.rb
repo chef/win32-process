@@ -19,7 +19,7 @@ module Process::Functions
 
   attach_function :CreateProcessA,
     [:string, :buffer_in, :pointer, :pointer, :bool,
-     :ulong, :string, :string, :pointer, :pointer], :bool
+     :ulong, :buffer_in, :string, :pointer, :pointer], :bool
 
   attach_function :CreateProcessW,
     [:buffer_in, :buffer_in, :pointer, :pointer, :bool,
