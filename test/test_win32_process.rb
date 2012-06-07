@@ -16,6 +16,10 @@ require 'win32/process'
 require 'sys/proctable'
 
 class TC_Win32Process < Test::Unit::TestCase
+  def self.startup
+    @@pids = []
+  end
+
   def setup
     @priority = Process::BELOW_NORMAL_PRIORITY_CLASS
   end
@@ -24,7 +28,6 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_equal('0.7.0', Process::WIN32_PROCESS_VERSION)
   end
 
-=begin
   test "create basic functionality" do
     assert_respond_to(Process, :create)
   end
@@ -40,7 +43,7 @@ class TC_Win32Process < Test::Unit::TestCase
       ).process_id
     }
 
-    assert_nothing_raised{ Process.kill(1, @@pids.pop) }
+    assert_nothing_raised{ Process.kill(9, @@pids.pop) }
   end
 
   test "create requires a hash argument" do
@@ -64,11 +67,8 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create raises an error if the executable cannot be found" do
-    err = "CreateProcess() failed: The system cannot find the file specified."
-    assert_raise(Process::Error){ Process.create(:app_name => "bogusapp.exe") }
-    assert_raise_message(err){ Process.create(:app_name => "bogusapp.exe") }
+    assert_raise(Errno::ENOENT){ Process.create(:app_name => "bogusapp.exe") }
   end
-=end
 
   test "uid basic functionality" do
     assert_respond_to(Process, :uid)
@@ -138,7 +138,6 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(TypeError){ Process.setpriority(0, 0, 'test') }
   end
 
-=begin
   test "custom creation constants are defined" do
     assert_not_nil(Process::CREATE_DEFAULT_ERROR_MODE)
     assert_not_nil(Process::CREATE_NEW_CONSOLE)
@@ -152,7 +151,6 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_not_nil(Process::DEBUG_PROCESS)
     assert_not_nil(Process::DETACHED_PROCESS)
   end
-=end
 
   test "getrlimit basic functionality" do
     assert_respond_to(Process, :getrlimit)
@@ -208,5 +206,9 @@ class TC_Win32Process < Test::Unit::TestCase
 
   def teardown
     @priority = nil
+  end
+
+  def self.shutdown
+    @@pids = nil
   end
 end
