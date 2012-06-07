@@ -392,23 +392,21 @@ module Process
 
       unless si_hash.empty?
         startinfo[:cb]              = startinfo.size
-        startinfo[:lpReserved]      = nil
-        startinfo[:lpDesktop]       = si_hash['desktop']
-        startinfo[:lpTitle]         = si_hash['title']
-        startinfo[:dwX]             = si_hash['x']
-        startinfo[:dwY]             = si_hash['y']
-        startinfo[:dwXSize]         = si_hash['x_size']
-        startinfo[:dwYSize]         = si_hash['y_size']
-        startinfo[:dwXCountChars]   = si_hash['x_count_chars']
-        startinfo[:dwYCountChars]   = si_hash['y_count_chars']
-        startinfo[:dwFillAttribute] = si_hash['fill_attribute']
-        startinfo[:dwFlags]         = si_hash['startf_flags']
-        startinfo[:wShowWindow]     = si_hash['sw_flags']
+        startinfo[:lpDesktop]       = si_hash['desktop'] if si_hash['desktop']
+        startinfo[:lpTitle]         = si_hash['title'] if si_hash['title']
+        startinfo[:dwX]             = si_hash['x'] if si_hash['x']
+        startinfo[:dwY]             = si_hash['y'] if si_hash['y']
+        startinfo[:dwXSize]         = si_hash['x_size'] if si_hash['x_size']
+        startinfo[:dwYSize]         = si_hash['y_size'] if si_hash['y_size']
+        startinfo[:dwXCountChars]   = si_hash['x_count_chars'] if si_hash['x_count_chars']
+        startinfo[:dwYCountChars]   = si_hash['y_count_chars'] if si_hash['y_count_chars']
+        startinfo[:dwFillAttribute] = si_hash['fill_attribute'] if si_hash['fill_attribute']
+        startinfo[:dwFlags]         = si_hash['startf_flags'] if si_hash['startf_flags']
+        startinfo[:wShowWindow]     = si_hash['sw_flags'] if si_hash['sw_flags']
         startinfo[:cbReserved2]     = 0
-        startinfo[:lpReserved2]     = nil
-        startinfo[:hStdInput]       = si_hash['stdin']
-        startinfo[:hStdOutput]      = si_hash['stdout']
-        startinfo[:hStdError]       = si_hash['stderr']
+        startinfo[:hStdInput]       = si_hash['stdin'] if si_hash['stdin']
+        startinfo[:hStdOutput]      = si_hash['stdout'] if si_hash['stdout']
+        startinfo[:hStdError]       = si_hash['stderr'] if si_hash['stderr']
       end
 
       if hash['with_logon']
