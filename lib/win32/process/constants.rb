@@ -2,6 +2,7 @@ module Process::Constants
   private
 
   # Priority constants
+
   ABOVE_NORMAL_PRIORITY_CLASS = 0x0008000
   BELOW_NORMAL_PRIORITY_CLASS = 0x0004000
   HIGH_PRIORITY_CLASS         = 0x0000080
@@ -10,22 +11,59 @@ module Process::Constants
   REALTIME_PRIORITY_CLASS     = 0x0000010
 
   # Error constants
+
   INVALID_HANDLE_VALUE = 0xffffffff
 
   # Process Access Rights
+
   PROCESS_SET_INFORMATION   = 0x00000200
   PROCESS_QUERY_INFORMATION = 0x00000400
 
+  # Process creation flags
+
+  CREATE_BREAKAWAY_FROM_JOB        = 0x01000000
+  CREATE_DEFAULT_ERROR_MODE        = 0x04000000
+  CREATE_NEW_CONSOLE               = 0x00000010
+  CREATE_NEW_PROCESS_GROUP         = 0x00000200
+  CREATE_NO_WINDOW                 = 0x08000000
+  CREATE_PRESERVE_CODE_AUTHZ_LEVEL = 0x02000000
+  CREATE_SEPARATE_WOW_VDM          = 0x00000800
+  CREATE_SHARED_WOW_VDM            = 0x00001000
+  CREATE_SUSPENDED                 = 0x00000004
+  CREATE_UNICODE_ENVIRONMENT       = 0x00000400
+  DEBUG_ONLY_THIS_PROCESS          = 0x00000002
+  DEBUG_PROCESS                    = 0x00000001
+  DETACHED_PROCESS                 = 0x00000008
+
+  STARTF_USESHOWWINDOW    = 0x00000001
+  STARTF_USESIZE          = 0x00000002
+  STARTF_USEPOSITION      = 0x00000004
+  STARTF_USECOUNTCHARS    = 0x00000008
+  STARTF_USEFILLATTRIBUTE = 0x00000010
+  STARTF_RUNFULLSCREEN    = 0x00000020
+  STARTF_FORCEONFEEDBACK  = 0x00000040
+  STARTF_FORCEOFFFEEDBACK = 0x00000080
+  STARTF_USESTDHANDLES    = 0x00000100
+  STARTF_USEHOTKEY        = 0x00000200
+
+  LOGON_WITH_PROFILE        = 0x00000001
+  LOGON_NETCREDENTIALS_ONLY = 0x00000002
+
+  SHUTDOWN_NORETRY = 0x00000001
+
   # Security
+
   TokenUser   = 1
   TOKEN_QUERY = 0x00000008
 
   # Define these for Windows
+
   PRIO_PROCESS = 0
   PRIO_PGRP    = 1
   PRIO_USER    = 2
 
   # Define these for Windows
+
   RLIMIT_CPU    = 0 # PerProcessUserTimeLimit
   RLIMIT_FSIZE  = 1 # Hard coded at 4TB - 64K (assumes NTFS)
   RLIMIT_AS     = 5 # ProcessMemoryLimit
@@ -33,6 +71,7 @@ module Process::Constants
   RLIMIT_VMEM   = 5 # ProcessMemoryLimit
 
   # Job constants
+
   JOB_OBJECT_SET_ATTRIBUTES       = 0x00000002
   JOB_OBJECT_QUERY                = 0x00000004
   JOB_OBJECT_LIMIT_PROCESS_TIME   = 0x00000002
@@ -40,5 +79,6 @@ module Process::Constants
   JobObjectExtendedLimitInformation = 9
 
   # Miscellaneous
+
   HANDLE_FLAG_INHERIT = 0x00000001
 end

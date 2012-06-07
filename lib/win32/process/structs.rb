@@ -59,7 +59,7 @@ module Process::Structs
   class STARTUPINFO < FFI::Struct
     layout(
       :cb, :ulong,
-      :lpReserve, :string,
+      :lpReserved, :string,
       :lpDesktop, :string,
       :lpTitle, :string,
       :dwX, :ulong,
@@ -70,7 +70,7 @@ module Process::Structs
       :dwYCountChars, :ulong,
       :dwFillAttribute, :ulong,
       :dwFlags, :ulong,
-      :wShowWindows, :short,
+      :wShowWindow, :short,
       :cbReserved2, :short,
       :lpReserved2, :pointer,
       :hStdInput, :ulong,
