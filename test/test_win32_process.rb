@@ -16,7 +16,8 @@ require 'win32/process'
 
 class TC_Win32Process < Test::Unit::TestCase
   def self.startup
-    @@pids = []
+    @@pids  = []
+    @@jruby = RUBY_PLATFORM == 'java'
   end
 
   def setup
@@ -70,6 +71,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create passes local environment when environment is not specified" do
+    omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
     ENV['AARDVARK'] = 'B'
@@ -86,6 +88,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create does not pass local environment when environment is specified" do
+    omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
     ENV['AARDVARK'] = 'B'
@@ -103,6 +106,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create supports :environment as a string" do
+    omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
     assert_nothing_raised {
@@ -119,6 +123,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create supports :environment as an array" do
+    omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
     assert_nothing_raised {
