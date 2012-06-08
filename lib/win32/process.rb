@@ -355,7 +355,10 @@ module Process
       end
 
       # Automatically handle stdin, stdout and stderr as either IO objects
-      # or file descriptors. This won't work for StringIO, however.
+      # or file descriptors. This won't work for StringIO, however. It also
+      # will not work on JRuby because of the way it handles internal file
+      # descriptors.
+      #
       ['stdin', 'stdout', 'stderr'].each{ |io|
         if si_hash[io]
           if si_hash[io].respond_to?(:fileno)
@@ -365,7 +368,15 @@ module Process
           end
 
           if handle == INVALID_HANDLE_VALUE
-            raise SystemCallError, FFI.errno, "get_osfhandle"
+            ptr = FFI::MemoryPointer.new(:int)
+
+            if get_errno(ptr) == 0
+              errno = ptr.read_int
+            else
+              errno = FFI.errno
+            end
+
+            raise SystemCallError, errno, "get_osfhandle"
           end
 
           # Most implementations of Ruby on Windows create inheritable

@@ -48,5 +48,6 @@ module Process::Functions
 
   ffi_lib FFI::Library::LIBC
 
+  attach_function :get_errno, :_get_errno, [:pointer], :int
   attach_function :get_osfhandle, :_get_osfhandle, [:int], :ulong
 end
