@@ -13,7 +13,6 @@
 ###############################################################################
 require 'test-unit'
 require 'win32/process'
-require 'sys/proctable'
 
 class TC_Win32Process < Test::Unit::TestCase
   def self.startup
