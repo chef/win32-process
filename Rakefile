@@ -4,7 +4,7 @@ require 'rake/testtask'
 require 'rbconfig'
 include RbConfig
 
-CLEAN.include('**/*.gem', '**/*.rbc')
+CLEAN.include('**/*.gem', '**/*.rbc', '**/*.log')
 
 namespace :gem do
   desc 'Create the win32-process gem'
