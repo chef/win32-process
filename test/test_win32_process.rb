@@ -244,6 +244,7 @@ class TC_Win32Process < Test::Unit::TestCase
   test "getrlimit basic functionality" do
     assert_respond_to(Process, :getrlimit)
     assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_FSIZE) }
   end
 
   test "getrlimit returns an array of two numeric elements" do

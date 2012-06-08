@@ -493,9 +493,11 @@ module Process
 
   private
 
-  def volume_type
-    buf = FFI::MemoryPointer.new(:char, 32)
-    bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)
-    bool ? buf.read_string : nil
+  class << self
+    def volume_type
+      buf = FFI::MemoryPointer.new(:char, 32)
+      bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)
+      bool ? buf.read_string : nil
+    end
   end
 end
