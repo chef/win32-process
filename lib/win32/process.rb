@@ -3,9 +3,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constant
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
 
 module Process
-  include Process::Functions
   include Process::Constants
-
   extend Process::Functions
   extend Process::Structs
   extend Process::Constants
