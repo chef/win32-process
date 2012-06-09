@@ -1,6 +1,7 @@
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'functions')
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constants')
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
+require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'helper')
 
 module Process
   include Process::Constants
@@ -520,7 +521,7 @@ module Process
         end
 
         env = env.map{ |e| e + 0.chr }.join('') + 0.chr
-        env.encode!('UTF-16LE') if hash['with_logon']
+        env.to_wide_string! if hash['with_logon']
       end
 
       # Process SECURITY_ATTRIBUTE structure
@@ -610,28 +611,28 @@ module Process
 
       # Convert strings to wide character strings if present
       if hash['app_name']
-        app = (hash['app_name'] + "\0").encode('UTF-16LE')
+        app = hash['app_name'].to_wide_string
       end
 
       if hash['command_line']
-        cmd = (hash['command_line'] + "\0").encode('UTF-16LE')
+        cmd = hash['command_line'].to_wide_string
       end
 
       if hash['cwd']
-        cwd = (hash['cwd'] + "\0").encode('UTF-16LE')
+        cwd = hash['cwd'].to_wide_string
       end
 
       if hash['with_logon']
-        logon  = (hash['with_logon'] + "\0").encode('UTF-16LE')
+        logon = hash['with_logon'].to_wide_string
 
         if hash['password']
-          passwd = (hash['password'] + "\0").encode('UTF-16LE')
+          passwd = hash['password'].to_wide_string
         else
           raise ArgumentError, 'password must be specified if with_logon is used'
         end
 
         if hash['domain']
-          domain = (hash['domain'] + "\0").encode('UTF-16LE')
+          domain = hash['domain'].to_wide_string
         end
 
         hash['creation_flags'] |= CREATE_UNICODE_ENVIRONMENT
