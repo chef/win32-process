@@ -294,6 +294,10 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(ArgumentError){ Process.job?(Process.pid) }
   end
 
+  test "volume_type is a private method" do
+    assert_not_respond_to(Process, :volume_type)
+  end
+
   def teardown
     @priority = nil
   end

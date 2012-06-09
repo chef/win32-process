@@ -13,13 +13,38 @@ module Process
   WIN32_PROCESS_VERSION = '0.7.0'
 
   class << self
-
+    # Returns whether or not the current process is part of a Job (process group).
     def job?
       pbool = FFI::MemoryPointer.new(:int)
       IsProcessInJob(GetCurrentProcess(), nil, pbool)
       pbool.read_int == 1 ? true : false
     end
 
+    # Returns the process and system affinity mask for the given +pid+, or the
+    # current process if no pid is provided. The return value is a two element
+    # array, with the first containing the process affinity mask, and the second
+    # containing the system affinity mask. Both are decimal values.
+    #
+    # A process affinity mask is a bit vector indicating the processors that a
+    # process is allowed to run on. A system affinity mask is a bit vector in
+    # which each bit represents the processors that are configured into a
+    # system.
+    #
+    # Example:
+    #
+    #    # System has 4 processors, current process is allowed to run on all
+    #    Process.get_affinity # => [[15], [15]], where '15' is 1 + 2 + 4 + 8
+    #
+    #    # System has 4 processors, current process only allowed on 1 and 4 only
+    #    Process.get_affinity # => [[9], [15]]
+    #
+    # If you want to convert a decimal bit vector into an array of 0's and 1's
+    # indicating the flag value of each processor, you can use something like
+    # this approach:
+    #
+    #    mask = Process.get_affinity.first
+    #    (0..mask).to_a.map{ |n| mask[n] }
+    #
     def get_affinity(int = Process.pid)
       pmask = FFI::MemoryPointer.new(:ulong)
       smask = FFI::MemoryPointer.new(:ulong)
@@ -49,6 +74,23 @@ module Process
 
     remove_method :getpriority
 
+    # Retrieves the priority class for the specified process id +int+. Unlike
+    # the default implementation, lower return values do not necessarily
+    # correspond to higher priority classes.
+    #
+    # The +kind+ parameter is ignored but required for API compatibility.
+    # You can only retrieve process information, not process group or user
+    # information, so it is effectively always Process::PRIO_PROCESS.
+    #
+    # Possible return values are:
+    #
+    # 32    => Process::NORMAL_PRIORITY_CLASS
+    # 64    => Process::IDLE_PRIORITY_CLASS
+    # 128   => Process::HIGH_PRIORITY_CLASS
+    # 256   => Process::REALTIME_PRIORITY_CLASS
+    # 16384 => Process::BELOW_NORMAL_PRIORITY_CLASS
+    # 32768 => Process::ABOVE_NORMAL_PRIORITY_CLASS
+    #
     def getpriority(kind, int)
       raise TypeError, kind unless kind.is_a?(Fixnum) # Match spec
       raise TypeError, int unless int.is_a?(Fixnum)   # Match spec
@@ -75,6 +117,21 @@ module Process
 
     remove_method :setpriority
 
+    # Sets the priority class for the specified process id +int+.
+    #
+    # The +kind+ parameter is ignored but present for API compatibility.
+    # You can only retrieve process information, not process group or user
+    # information, so it is effectively always Process::PRIO_PROCESS.
+    #
+    # Possible +int_priority+ values are:
+    #
+    # * Process::NORMAL_PRIORITY_CLASS
+    # * Process::IDLE_PRIORITY_CLASS
+    # * Process::HIGH_PRIORITY_CLASS
+    # * Process::REALTIME_PRIORITY_CLASS
+    # * Process::BELOW_NORMAL_PRIORITY_CLASS
+    # * Process::ABOVE_NORMAL_PRIORITY_CLASS
+    #
     def setpriority(kind, int, int_priority)
       raise TypeError unless kind.is_a?(Integer)          # Match spec
       raise TypeError unless int.is_a?(Integer)           # Match spec
@@ -100,6 +157,14 @@ module Process
 
     remove_method :uid
 
+    # Returns the uid of the current process. Specifically, it returns the
+    # RID of the SID associated with the owner of the process.
+    #
+    # If +sid+ is set to true, then a binary sid is returned. Otherwise, a
+    # numeric id is returned (the default).
+    #--
+    # The Process.uid method in core Ruby always returns 0 on MS Windows.
+    #
     def uid(sid = false)
       token = FFI::MemoryPointer.new(:ulong)
 
@@ -142,6 +207,38 @@ module Process
 
     remove_method :getrlimit
 
+    # Gets the resource limit of the current process. Only a limited number
+    # of flags are supported.
+    #
+    # Process::RLIMIT_CPU
+    # Process::RLIMIT_FSIZE
+    # Process::RLIMIT_AS
+    # Process::RLIMIT_RSS
+    # Process::RLIMIT_VMEM
+    #
+    # The Process:RLIMIT_AS, Process::RLIMIT_RSS and Process::VMEM constants
+    # all refer to the Process memory limit. The Process::RLIMIT_CPU constant
+    # refers to the per process user time limit. The Process::RLIMIT_FSIZE
+    # constant is hard coded to the maximum file size on an NTFS filesystem,
+    # approximately 4TB (or 4GB if not NTFS).
+    #
+    # While a two element array is returned in order to comply with the spec,
+    # there is no separate hard and soft limit. The values will always be the
+    # same.
+    #
+    # If [0,0] is returned then it means no limit has been set.
+    #
+    # Example:
+    #
+    #   Process.getrlimit(Process::RLIMIT_VMEM) # => [0, 0]
+    #--
+    # NOTE: Both the getrlimit and setrlimit method use an at_exit handler
+    # to close a job handle. This is necessary because simply calling it
+    # at the end of the block, while marking it for closure, would also make
+    # it unavailable within the same process again since it would no longer
+    # be associated with the job. In other words, trying to call it more than
+    # once within the same program would fail.
+    #
     def getrlimit(resource)
       if resource == RLIMIT_FSIZE
         if volume_type == 'NTFS'
@@ -212,6 +309,26 @@ module Process
 
     remove_method :setrlimit
 
+    # Sets the resource limit of the current process. Only a limited number
+    # of flags are supported.
+    #
+    # Process::RLIMIT_CPU
+    # Process::RLIMIT_AS
+    # Process::RLIMIT_RSS
+    # Process::RLIMIT_VMEM
+    #
+    # The Process:RLIMIT_AS, Process::RLIMIT_RSS and Process::VMEM constants
+    # all refer to the Process memory limit. The Process::RLIMIT_CPU constant
+    # refers to the per process user time limit.
+    #
+    # The +max_limit+ parameter is provided for interface compatibility only.
+    # It is always set to the current_limit value.
+    #
+    # Example:
+    #
+    #   Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) # => nil
+    #   Process.getrlimit(Process::RLIMIT_VMEM) # => [4096, 4096]
+    #
     def setrlimit(resource, current_limit, max_limit = nil)
       max_limit = current_limit
 
@@ -266,6 +383,78 @@ module Process
       end
     end
 
+    # Process.create(key => value, ...) => ProcessInfo
+    #
+    # This is a wrapper for the CreateProcess() function. It executes a process,
+    # returning a ProcessInfo struct. It accepts a hash as an argument.
+    # There are several primary keys:
+    #
+    # * command_line     (this or app_name must be present)
+    # * app_name         (default: nil)
+    # * inherit          (default: false)
+    # * process_inherit  (default: false)
+    # * thread_inherit   (default: false)
+    # * creation_flags   (default: 0)
+    # * cwd              (default: Dir.pwd)
+    # * startup_info     (default: nil)
+    # * environment      (default: nil)
+    # * close_handles    (default: true)
+    # * with_logon       (default: nil)
+    # * domain           (default: nil)
+    # * password         (default: nil, mandatory if with_logon)
+    #
+    # Of these, the 'command_line' or 'app_name' must be specified or an
+    # error is raised. Both may be set individually, but 'command_line' should
+    # be preferred if only one of them is set because it does not (necessarily)
+    # require an explicit path or extension to work.
+    #
+    # The 'domain' and 'password' options are only relevent in the context
+    # of 'with_logon'. If 'with_logon' is set, then the 'password' option is
+    # mandatory.
+    #
+    # The startup_info key takes a hash. Its keys are attributes that are
+    # part of the StartupInfo struct, and are generally only meaningful for
+    # GUI or console processes. See the documentation on CreateProcess()
+    # and the StartupInfo struct on MSDN for more information.
+    #
+    # * desktop
+    # * title
+    # * x
+    # * y
+    # * x_size
+    # * y_size
+    # * x_count_chars
+    # * y_count_chars
+    # * fill_attribute
+    # * sw_flags
+    # * startf_flags
+    # * stdin
+    # * stdout
+    # * stderr
+    #
+    # Note that the 'stdin', 'stdout' and 'stderr' options can be either Ruby
+    # IO objects or file descriptors (i.e. a fileno). However, StringIO objects
+    # are not currently supported. Unfortunately, setting these is not currently
+    # an option for JRuby.
+    #
+    # If 'stdin', 'stdout' or 'stderr' are specified, then the +inherit+ value
+    # is automatically set to true and the Process::STARTF_USESTDHANDLES flag is
+    # automatically OR'd to the +startf_flags+ value.
+    #
+    # The ProcessInfo struct contains the following members:
+    #
+    # * process_handle - The handle to the newly created process.
+    # * thread_handle  - The handle to the primary thread of the process.
+    # * process_id     - Process ID.
+    # * thread_id      - Thread ID.
+    #
+    # If the 'close_handles' option is set to true (the default) then the
+    # process_handle and the thread_handle are automatically closed for you
+    # before the ProcessInfo struct is returned.
+    #
+    # If the 'with_logon' option is set, then the process runs the specified
+    # executable file in the security context of the specified credentials.
+    #
     def create(args)
       unless args.kind_of?(Hash)
         raise TypeError, 'hash keyword arguments expected'
@@ -423,9 +612,20 @@ module Process
         cmd = nil
 
         logon  = (hash['with_logon'] + "\0").encode('UTF-16LE')
-        domain = (hash['domain'] + "\0").encode('UTF-16LE')
-        cwd    = (hash['cwd'] + "\0").encode('UTF-16LE')
-        passwd = (hash['password'] + "\0").encode('UTF-16LE')
+
+        if hash['password']
+          passwd = (hash['password'] + "\0").encode('UTF-16LE')
+        else
+          raise ArgumentError, 'password must be specified if with_logon is used'
+        end
+
+        if hash['domain']
+          domain = (hash['domain'] + "\0").encode('UTF-16LE')
+        end
+
+        if hash['cwd']
+          cwd = (hash['cwd'] + "\0").encode('UTF-16LE')
+        end
 
         if hash['app_name']
           app = (hash['app_name'] + "\0").encode('UTF-16LE')
@@ -491,9 +691,10 @@ module Process
     end
   end
 
-  private
-
   class << self
+    private
+
+    # Private method that returns the volume type, e.g. "NTFS", etc.
     def volume_type
       buf = FFI::MemoryPointer.new(:char, 32)
       bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)

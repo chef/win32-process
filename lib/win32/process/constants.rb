@@ -61,7 +61,8 @@ module Process::Constants
   TokenUser   = 1
   TOKEN_QUERY = 0x00000008
 
-  # Define these for Windows
+  # Define these for Windows. They are not actually used but are defined
+  # for interface compatibility.
 
   PRIO_PROCESS = 0
   PRIO_PGRP    = 1
