@@ -605,10 +605,23 @@ module Process
         startinfo[:hStdError]       = si_hash['stderr'] if si_hash['stderr']
       end
 
-      if hash['with_logon']
-        app = nil
-        cmd = nil
+      app = nil
+      cmd = nil
 
+      # Convert strings to wide character strings if present
+      if hash['app_name']
+        app = (hash['app_name'] + "\0").encode('UTF-16LE')
+      end
+
+      if hash['command_line']
+        cmd = (hash['command_line'] + "\0").encode('UTF-16LE')
+      end
+
+      if hash['cwd']
+        cwd = (hash['cwd'] + "\0").encode('UTF-16LE')
+      end
+
+      if hash['with_logon']
         logon  = (hash['with_logon'] + "\0").encode('UTF-16LE')
 
         if hash['password']
@@ -619,18 +632,6 @@ module Process
 
         if hash['domain']
           domain = (hash['domain'] + "\0").encode('UTF-16LE')
-        end
-
-        if hash['cwd']
-          cwd = (hash['cwd'] + "\0").encode('UTF-16LE')
-        end
-
-        if hash['app_name']
-          app = (hash['app_name'] + "\0").encode('UTF-16LE')
-        end
-
-        if hash['command_line']
-          cmd = (hash['command_line'] + "\0").encode('UTF-16LE')
         end
 
         hash['creation_flags'] |= CREATE_UNICODE_ENVIRONMENT
@@ -653,17 +654,17 @@ module Process
           raise SystemCallError, FFI.errno, "CreateProcessWithLogonW"
         end
       else
-        inherit = hash['inherit'] || false
+        inherit  = hash['inherit'] || false
 
-        bool = CreateProcessA(
-          hash['app_name'],       # App name
-          hash['command_line'],   # Command line
+        bool = CreateProcessW(
+          app,                    # App name
+          cmd,                    # Command line
           process_security,       # Process attributes
           thread_security,        # Thread attributes
           inherit,                # Inherit handles?
           hash['creation_flags'], # Creation flags
           env,                    # Environment
-          hash['cwd'],            # Working directory
+          cwd,                    # Working directory
           startinfo,              # Startup Info
           procinfo                # Process Info
         )

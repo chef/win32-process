@@ -30,10 +30,6 @@ module Process::Functions
   attach_pfunc :GetVolumeInformationA,
     [:string, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong], :bool
 
-  attach_pfunc :CreateProcessA,
-    [:string, :buffer_in, :pointer, :pointer, :bool,
-     :ulong, :buffer_in, :string, :pointer, :pointer], :bool
-
   attach_pfunc :CreateProcessW,
     [:buffer_in, :buffer_in, :pointer, :pointer, :bool,
      :ulong, :buffer_in, :buffer_in, :pointer, :pointer], :bool

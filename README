@@ -37,7 +37,7 @@
    issue as well.
    
    With Ruby 1.9 now becoming standard and its addition of Process.spawn
-   and friends (and concommitant support for the Process.waitXXX methods) I
+   and friends (and concomitant support for the Process.waitXXX methods) I
    felt it was time to remove it.
 
    You can still simulate Process.fork if you like using Process.create, which
