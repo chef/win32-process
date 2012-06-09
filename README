@@ -1,12 +1,10 @@
 = Description
-  This library provides the fork, wait, wait2, waitpid, and waitpid2 methods
-  for MS Windows. In addition, it provides a different implementation of the
-  kill method, a proper implementation of Process.ppid, and decent analogues
-  of Process.getpriority, Process.setpriority, Process.getrlimit and
-  Process.setrlimit.
-
+  This library provides analogues of the :getpriority, :setpriority, :getrlimit,
+  and :setrlimit methods for MS Windows. It also adds the new methods :job?,
+  :get_affinity, and :create.
+ 
 = Prerequisites
-  * windows-pr
+  * ffi
   * sys-proctable (dev only)
   * test-unit 2 (dev only)
 
@@ -19,92 +17,65 @@
 = Synopsis
   require 'win32/process'
 
-  Process.fork{
-    3.times{
-      puts 'In the child'
-      sleep 1
-    }
-  }
+  p Process.job? # => true or false
 
-  Process.wait
-  puts 'Done'
+  info = Process.create(
+    :app_name         => "notepad.exe",
+    :creation_flags   => Process::DETACHED_PROCESS,
+    :process_inherit  => false,
+    :thread_inherit   => true,
+    :cwd              => "C:\\"
+  )
+
+  p info.process_id
 	
 = Developer's Notes
-== The Process.fork and Process.wait methods
-   The fork method is emulated on Windows by spawning another Ruby process
-   against $PROGRAM_NAME via the CreateProcess() Win32 API function. It will
-   use its parent's environment and starting directory.
-	
-   The various wait methods are a wrapper for the WaitForSingleObject() or
-   WaitForMultipleObjects() Win32 API functions, for the wait* and waitpid*
-   methods, respectively.  In the case of wait2 and waitpid2, the exit value
-   is returned via the GetExitCodeProcess() Win32API function.
-	
-   For now the waitpid and waitpid2 calls do not accept a second argument.
-   That's because we haven't yet determined if there's a signal we should
-   allow to be sent.
-
-   IMPORTANT!	
-   Note that because fork is calling CreateProcess($PROGRAM_NAME), it will
-   start again from the top of the script instead of from the point of the
-   call. We will try to address this in a future release, if possible.
-	
-== The Process.kill method
-   Initially, the kill method will try to get a HANDLE on the PID using the
-   OpenProcess() function. If that succeeds, we know the process is running.
-
-   In the event of signal 2 or signal 3, the GenerateConsoleCtrlEvent()
-   function is used to send a signal to that process. These will not kill
-   GUI processes. It will not (currently) send a signal to remote
-   processes.
-
-   In the event of signal 1 or 4-8, the CreateRemoteThread() function is used
-   after the HANDLE's process has been identified to create a thread
-   within that process. The ExitProcess() function is then sent to that
-   thread.
-
-   In the event of signal 9, the TerminateProcess() function is called. This
-   will almost certainly kill the process, but doesn't give the process a
-   chance to necessarily do any cleanup it might otherwise do.
+== Removal of Process.fork in release 0.7.0
+   The Process.fork method was originally experimental but it has never
+   been particularly useful in practice. On top of that, it required special
+   implementations of the Process.waitXXX methods, so it was a maintenance
+   issue as well.
    
-== The Process.ppid method
-   In MRI the Process.ppid always returns 0 on MS Windows. With this library
-   it returns the actual parent pid.
+   With Ruby 1.9 now becoming standard and its addition of Process.spawn
+   and friends (and concommitant support for the Process.waitXXX methods) I
+   felt it was time to remove it.
 
-== Differences between Ruby's kill and the Win32 Utils kill
-   Ruby does not currently use the CreateRemoteThread() + ExitProcess()
-   approach which is, according to everything I've read, a cleaner approach.
-   This includes not only online research but also Jeffrey Richter's
-   "Advanced Windows Programming, 3rd Edition."
+   You can still simulate Process.fork if you like using Process.create, which
+   is how it was implemented internally anyway. A better solution might be
+   to follow in the footsteps of ActiveState Perl, which uses native threads
+   to simulate fork on Windows.
 	
-   Also, the way Process.kill handles multiple pids works slightly differently
-   (and better IMHO) in the Win32 Utils version than the way Ruby currently
-   provides.
+== The removal of the custom Process.kill method
+   We added the Process.kill method originally because it wasn't supported
+   at all back in the bad old Ruby 1.6 days. It was added in Ruby 1.8, but
+   the implementation was (and still is) not particularly good.
 
-   The reason Process.kill was originally added, in case anyone cares for
-   historical trivia, is that Ruby 1.6.x did not support Process.kill on
-   Windows at all.
-	
-= Notes
-  It is unlikely you will be able to kill system processes with this module.
-  It's probably better that you don't.
-	
+   The problem is that there is no nice way to kill a process on Windows
+   with Ruby, i.e. exit handlers are bypassed in the same manner as a
+   "kill -9" on Unix systems. We decided to implement a nicer way to kill
+   processes when not using signal 9 that would still allow processes to
+   perform cleanup before terminating.
+
+   However, we also implemented slightly different semantics for how multiple
+   pids are handled if the kill attempt on any one of them fails. Originally
+   I wanted the MRI core team to adopt our approach, but that never happened
+   and now I worry about compatibility issues. On top of that I really think
+   this is something that ought to be fixed in core Ruby, so I've decided to
+   remove this crutch and try to force the issue.
+
+== The removal of the custom Process.ppid method
+   This was added at some point in the Ruby 1.9 dev cycle so it was removed
+   from this library.
+
 = Known Bugs	
-  None known (though please see the +Details+ section for quirks).  Any
-  bugs should be reported on the project page at
-  http://rubyforge.org/projects/win32utils.
-	
-= Future Plans  
-  Train Process.fork to execute from the point of the call rather than the
-  top of the script (if possible).
-	
-  Other suggestions welcome.
+  None known. Any bugs should be reported on the project page at
+  https://github.com/djberg96/win32-process.
 	
 = License
   Artistic 2.0
 	
 = Copyright
-  (C) 2003-2011 Daniel J. Berger
+  (C) 2003-2012 Daniel J. Berger
   All Rights Reserved
 		
 = Warranty
