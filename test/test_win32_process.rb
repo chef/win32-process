@@ -298,6 +298,17 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_not_respond_to(Process, :volume_type)
   end
 
+  test "ffi functions are private" do
+    assert_not_respond_to(Process, :CloseHandle)
+    assert_not_respond_to(Process, :GetCurrentProcess)
+    assert_not_respond_to(Process, :GetProcessAffinityMask)
+    assert_not_respond_to(Process, :GetPriorityClass)
+    assert_not_respond_to(Process, :IsProcessInJob)
+    assert_not_respond_to(Process, :OpenProcess)
+    assert_not_respond_to(Process, :SetHandleInformation)
+    assert_not_respond_to(Process, :SetPriorityClass)
+  end
+
   def teardown
     @priority = nil
   end
