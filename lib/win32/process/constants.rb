@@ -13,11 +13,14 @@ module Process::Constants
   # Error constants
 
   INVALID_HANDLE_VALUE = 0xffffffff
+  ERROR_ACCESS_DENIED  = 0x00000005
 
   # Process Access Rights
 
   PROCESS_SET_INFORMATION   = 0x00000200
   PROCESS_QUERY_INFORMATION = 0x00000400
+  PROCESS_ALL_ACCESS        = 0x001F0FFF
+  PROCESS_VM_READ           = 0x00000010
 
   # Process creation flags
 
@@ -87,4 +90,9 @@ module Process::Constants
   # Miscellaneous
 
   HANDLE_FLAG_INHERIT = 0x00000001
+
+  # Console Events
+
+  CTRL_C_EVENT     = 0
+  CTRL_BREAK_EVENT = 1
 end

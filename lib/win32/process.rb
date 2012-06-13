@@ -689,6 +689,89 @@ module Process
         procinfo[:dwThreadId]
       )
     end
+
+    remove_method :kill
+
+    def kill(signal, *pids)
+      int = Signal.list['INT']
+
+      count = 0
+
+      pids.each{ |pid|
+        raise SystemCallError.new(22) if pid < 0 # EINVAL
+
+        # Treat a pid of 0 as the current process.
+        pid = Process.pid if pid == 0
+
+        if signal == 0
+          access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ
+        else
+          access = PROCESS_ALL_ACCESS
+        end
+
+        begin
+          handle = OpenProcess(access, false, pid)
+
+          if signal != 0 && handle == INVALID_HANDLE_VALUE
+            raise SystemCallError, FFI.errno, "OpenProcess"
+          end
+
+          case signal
+            when 0
+              if handle != INVALID_HANDLE_VALUE
+                count += 1
+              else
+                if FFI.errno == ERROR_ACCESS_DENIED
+                  count += 1
+                else
+                  raise SystemCallError, FFI.errno, "OpenProcess"
+                end
+              end
+            when Signal.list['INT'], 'INT', 'SIGINT', 2
+              if GenerateConsoleCtrlEvent(CTRL_C_EVENT, pid)
+                count += 1
+              else
+                raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
+              end
+            when Signal.list['BRK'], 'BRK', 'SIGBRK', 3
+              if GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pid)
+                count += 1
+              else
+                raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
+              end
+            when Signal.list['KILL'], 'KILL', 'SIGKILL', 9
+              if TerminateProcess(handle, pid)
+                count += 1
+              else
+                raise SystemCallError, FFI.errno, "TerminateProcess"
+              end
+            else
+              thread_id = FFI::MemoryPointer.new(:ulong)
+
+              thread = CreateRemoteThread(
+                handle,
+                nil,
+                0,
+                GetProcAddress(GetModuleHandle('kernel32'), 'ExitProcess'),
+                nil,
+                0,
+                thread_id
+              )
+
+              if thread > 0
+                WaitForSingleObject(thread, 5)
+                count += 1
+              else
+                raise SystemCallError, FFI.errno, "CreateRemoteThread"
+              end
+          end
+        ensure
+          CloseHandle(handle) if handle
+        end
+      }
+
+      count
+    end
   end
 
   class << self

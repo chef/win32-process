@@ -19,13 +19,21 @@ module Process::Functions
   ffi_lib :kernel32
 
   attach_pfunc :CloseHandle, [:ulong], :bool
+  attach_pfunc :GenerateConsoleCtrlEvent, [:ulong, :ulong], :bool
   attach_pfunc :GetCurrentProcess, [], :ulong
+  attach_pfunc :GetModuleHandle, :GetModuleHandleA, [:string], :ulong
   attach_pfunc :GetProcessAffinityMask, [:ulong, :pointer, :pointer], :bool
   attach_pfunc :GetPriorityClass, [:ulong], :ulong
+  attach_pfunc :GetProcAddress, [:ulong, :string], :ulong
   attach_pfunc :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_pfunc :OpenProcess, [:ulong, :bool, :ulong], :ulong
   attach_pfunc :SetHandleInformation, [:ulong, :ulong, :ulong], :bool
   attach_pfunc :SetPriorityClass, [:ulong, :ulong], :bool
+  attach_pfunc :TerminateProcess, [:ulong, :uint], :bool
+  attach_pfunc :WaitForSingleObject, [:ulong, :ulong], :ulong
+
+  attach_pfunc :CreateRemoteThread,
+    [:ulong, :pointer, :size_t, :ulong, :pointer, :ulong, :pointer], :ulong
 
   attach_pfunc :GetVolumeInformationA,
     [:string, :pointer, :ulong, :pointer, :pointer, :pointer, :pointer, :ulong], :bool
