@@ -87,12 +87,14 @@ module Process::Constants
   JOB_OBJECT_LIMIT_PROCESS_MEMORY = 0x00000100
   JobObjectExtendedLimitInformation = 9
 
-  # Miscellaneous
-
-  HANDLE_FLAG_INHERIT = 0x00000001
-
   # Console Events
 
   CTRL_C_EVENT     = 0
   CTRL_BREAK_EVENT = 1
+
+  # Miscellaneous
+
+  HANDLE_FLAG_INHERIT     = 0x00000001
+  SEM_FAILCRITICALERRORS  = 0x00000001
+  SEM_NOGPFAULTERRORBOX   = 0x00000002
 end

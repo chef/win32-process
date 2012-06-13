@@ -3,6 +3,7 @@ require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constant
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'helper')
 
+
 module Process
   include Process::Constants
   extend Process::Functions
@@ -10,6 +11,8 @@ module Process
   extend Process::Constants
 
   WIN32_PROCESS_VERSION = '0.7.0'
+
+  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
 
   class << self
     # Returns whether or not the current process is part of a Job (process group).

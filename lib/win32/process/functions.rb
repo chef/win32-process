@@ -28,6 +28,7 @@ module Process::Functions
   attach_pfunc :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_pfunc :OpenProcess, [:ulong, :bool, :ulong], :ulong
   attach_pfunc :SetHandleInformation, [:ulong, :ulong, :ulong], :bool
+  attach_pfunc :SetErrorMode, [:uint], :uint
   attach_pfunc :SetPriorityClass, [:ulong, :ulong], :bool
   attach_pfunc :TerminateProcess, [:ulong, :uint], :bool
   attach_pfunc :WaitForSingleObject, [:ulong, :ulong], :ulong
