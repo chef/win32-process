@@ -712,13 +712,13 @@ module Process
         begin
           handle = OpenProcess(access, false, pid)
 
-          if signal != 0 && handle == INVALID_HANDLE_VALUE
+          if signal != 0 && handle == 0
             raise SystemCallError, FFI.errno, "OpenProcess"
           end
 
           case signal
             when 0
-              if handle != INVALID_HANDLE_VALUE
+              if handle != 0
                 count += 1
               else
                 if FFI.errno == ERROR_ACCESS_DENIED
