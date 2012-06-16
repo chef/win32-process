@@ -42,6 +42,14 @@ namespace :example do
   end
 end
 
+namespace :test do
+  Rake::TestTask.new(:kill) do |t|
+    t.verbose = true
+    t.warning = true
+    t.test_files = FileList['test/test_win32_process_kill.rb']
+  end
+end
+
 Rake::TestTask.new do |t|
   t.verbose = true
   t.warning = true
