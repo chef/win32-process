@@ -696,6 +696,29 @@ module Process
 
     remove_method :kill
 
+    #
+    # Process.kill(1, 12345, :exit_proc => 'ExitProcess', :module => 'kernel32')
+    #
+    # Possible options for signals 1 and 4-8.
+    #
+    # :exit_proc  => The name of the exit function called when signal 1 or 4-8
+    #                is used. The default is 'ExitProcess'.
+    #
+    # :dll_module => The name of the .dll (or .exe) that contains :exit_proc.
+    #                The default is 'kernel32'.
+    #
+    # :ruby_proc  => If you set this to true then this method assumes you're
+    #                killing a Ruby process and it will set :exit_proc and
+    #                :dll_module to values that will ensure that any at_exit
+    #                hooks are called when the process is killed.
+    #
+    # :wait_time  => The time, in milliseconds, to wait for the process to
+    #                actually die. The default is 5ms. If you specify 0 here
+    #                then the process does not wait if the process is not
+    #                signaled and instead returns immediately. Alternatively,
+    #                you may specify Process::INFINITE, and your code will
+    #                block until the process is actually signaled.
+    #
     def kill(signal, *pids)
       # Match the spec, signal may not be less than zero if numeric
       if signal.is_a?(Numeric) && signal < 0 # EINVAL
@@ -713,6 +736,42 @@ module Process
         unless Signal.list.keys.include?(signal) || ['BRK', 'BRK'].include?(signal)
           raise ArgumentError, "unsupported name '#{signal}'"
         end
+      end
+
+      # If the last argument is a hash, pop it and assume it's a hash of options
+      if pids.last.is_a?(Hash)
+        options = pids.pop
+
+        valid = %w[exit_proc, dll_module, ruby_proc wait_time]
+
+        # Validate the options, downcase and to_s everything.
+        options.each{ |k,v|
+          k = k.to_s.downcase
+          unless valid.include?(k)
+            raise ArgumentError, "invalid option '#{k}'"
+          end
+        }
+
+        exit_proc  = options['exit_proc']
+        dll_module = options['dll_module']
+        ruby_proc  = options['ruby_proc']
+        wait_time  = options['wait_time']
+
+        # If ruby_proc is true, then use rb_f_exit as the exit_proc and
+        # RUBY_SO_NAME (e.g. msvcrt-ruby191) as the dll_module. However,
+        # we defer to user defined options for both of these first.
+        if ruby_proc
+          require 'rbconfig'
+          exit_proc  = exit_proc  || 'rb_f_exit'
+          dll_module = dll_module || RbConfig::CONFIG['RUBY_SO_NAME']
+        else
+          exit_proc  = 'ExitProcess'
+          dll_module = 'kernel32'
+        end
+      else
+        wait_time  = 5
+        exit_proc  = 'ExitProcess'
+        dll_module = 'kernel32'
       end
 
       count = 0
@@ -777,14 +836,14 @@ module Process
                 handle,
                 nil,
                 0,
-                GetProcAddress(GetModuleHandle('kernel32'), 'ExitProcess'),
+                GetProcAddress(GetModuleHandle(dll_module), exit_proc),
                 nil,
                 0,
                 thread_id
               )
 
               if thread > 0
-                WaitForSingleObject(thread, 5)
+                WaitForSingleObject(thread, wait_time)
                 count += 1
               else
                 raise SystemCallError, FFI.errno, "CreateRemoteThread"
