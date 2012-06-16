@@ -12,6 +12,7 @@ module Process
 
   WIN32_PROCESS_VERSION = '0.7.0'
 
+  # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
 
   class << self
@@ -696,20 +697,41 @@ module Process
     remove_method :kill
 
     def kill(signal, *pids)
-      int = Signal.list['INT']
+      # Match the spec, signal may not be less than zero if numeric
+      if signal.is_a?(Numeric) && signal < 0 # EINVAL
+        raise SystemCallError.new(22)
+      end
+
+      # Match the spec, signal must be a numeric, string or symbol
+      unless signal.is_a?(String) || signal.is_a?(Numeric) || signal.is_a?(Symbol)
+        raise ArgumentError, "bad signal type #{signal.class}"
+      end
+
+      # Match the spec, making an exception for BRK/SIGBRK, if the signal name is invalid
+      if signal.is_a?(String) || signal.is_a?(Symbol)
+        signal = signal.to_s.sub('SIG', '')
+        unless Signal.list.keys.include?(signal) || ['BRK', 'BRK'].include?(signal)
+          raise ArgumentError, "unsupported name '#{signal}'"
+        end
+      end
 
       count = 0
 
       pids.each{ |pid|
-        raise SystemCallError.new(22) if pid < 0 # EINVAL
+        raise TypeError unless pid.is_a?(Numeric) # Match spec, pid must be a number
+        raise SystemCallError.new(22) if pid < 0  # Match spec, EINVAL if pid less than zero
 
-        # Treat a pid of 0 as the current process.
-        pid = Process.pid if pid == 0
+        sigint = [Signal.list['INT'], 'INT', 'SIGINT', :INT, :SIGINT, 2]
+
+        # Match the spec
+        if pid == 0 && !sigint.include?(signal)
+          raise SystemCallError.new(22)
+        end
 
         if signal == 0
           access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ
         else
-          access = PROCESS_ALL_ACCESS
+          access = PROCESS_TERMINATE
         end
 
         begin
@@ -727,22 +749,22 @@ module Process
                 if FFI.errno == ERROR_ACCESS_DENIED
                   count += 1
                 else
-                  raise SystemCallError, FFI.errno, "OpenProcess"
+                  raise SystemCallError.new(3) # ESRCH
                 end
               end
-            when Signal.list['INT'], 'INT', 'SIGINT', 2
+            when Signal.list['INT'], 'INT', 'SIGINT', :INT, :SIGINT, 2
               if GenerateConsoleCtrlEvent(CTRL_C_EVENT, pid)
                 count += 1
               else
                 raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
               end
-            when Signal.list['BRK'], 'BRK', 'SIGBRK', 3
+            when Signal.list['BRK'], 'BRK', 'SIGBRK', :BRK, :SIGBRK, 3
               if GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pid)
                 count += 1
               else
                 raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
               end
-            when Signal.list['KILL'], 'KILL', 'SIGKILL', 9
+            when Signal.list['KILL'], 'KILL', 'SIGKILL', :KILL, :SIGKILL, 9
               if TerminateProcess(handle, pid)
                 count += 1
               else

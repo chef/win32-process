@@ -3,6 +3,7 @@
 #
 # Tests for the custom Process.kill method
 ########################################################################
+require 'win32/process'
 require 'test-unit'
 
 class TC_Win32_Process_Kill < Test::Unit::TestCase
@@ -73,9 +74,10 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
     assert_raise(Errno::EINVAL){ Process.kill(9, 0) }
   end
 
-  test "an EINVAL error is raised if the pid is the current process and it's not a 0 or SIGKILL" do
-    assert_raise(Errno::EINVAL){ Process.kill(1, Process.pid) }
-  end
+  # We break from the spec here.
+  #test "an EINVAL error is raised if the pid is the current process and it's not a 0 or SIGKILL" do
+  #  assert_raise(Errno::EINVAL){ Process.kill(1, Process.pid) }
+  #end
 
   test "kill requires at least two arguments" do
     assert_raise(ArgumentError){ Process.kill }
@@ -101,9 +103,10 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
     assert_raise(TypeError){ Process.kill(0, "BOGUS") }
   end
 
+  # TODO: Fix this
   #test "kill raises an EPERM if user does not have proper privileges" do
-    #omit_if(Process.uid == 0)
-    #assert_raise(Errno::EPERM){ Process.kill(9, 1) }
+  #  omit_if(Process.uid == 0)
+  #  assert_raise(Errno::EPERM){ Process.kill(9, 1) }
   #end
 
   test "kill raises a SecurityError if $SAFE level is 2 or greater" do
