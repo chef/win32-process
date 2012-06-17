@@ -790,8 +790,10 @@ module Process
 
         if signal == 0
           access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ
-        else
+        elsif signal == 9
           access = PROCESS_TERMINATE
+        else
+          access = PROCESS_ALL_ACCESS
         end
 
         begin
