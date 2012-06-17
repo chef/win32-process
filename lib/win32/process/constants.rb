@@ -23,6 +23,10 @@ module Process::Constants
   PROCESS_ALL_ACCESS        = 0x001F0FFF
   PROCESS_VM_READ           = 0x00000010
 
+  # Process wait time for Process.kill
+
+  INFINITE = 0xFFFFFFFF
+
   # Process creation flags
 
   CREATE_BREAKAWAY_FROM_JOB        = 0x01000000
