@@ -740,22 +740,23 @@ module Process
 
       # If the last argument is a hash, pop it and assume it's a hash of options
       if pids.last.is_a?(Hash)
-        options = pids.pop
+        hash = pids.pop
+        opts = {}
 
         valid = %w[exit_proc, dll_module, ruby_proc wait_time]
 
-        # Validate the options, downcase and to_s everything.
-        options.each{ |k,v|
+        hash.each{ |k,v|
           k = k.to_s.downcase
           unless valid.include?(k)
             raise ArgumentError, "invalid option '#{k}'"
           end
+          opts[k] = v
         }
 
-        exit_proc  = options['exit_proc']
-        dll_module = options['dll_module']
-        ruby_proc  = options['ruby_proc']
-        wait_time  = options['wait_time']
+        exit_proc  = opts['exit_proc']
+        dll_module = opts['dll_module']
+        ruby_proc  = opts['ruby_proc']
+        wait_time  = opts['wait_time'] || 5
 
         # If ruby_proc is true, then use rb_f_exit as the exit_proc and
         # RUBY_SO_NAME (e.g. msvcrt-ruby191) as the dll_module. However,
