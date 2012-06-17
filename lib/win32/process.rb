@@ -766,8 +766,8 @@ module Process
           exit_proc  = exit_proc  || 'rb_f_exit'
           dll_module = dll_module || RbConfig::CONFIG['RUBY_SO_NAME']
         else
-          exit_proc  = 'ExitProcess'
-          dll_module = 'kernel32'
+          exit_proc  = exit_proc  || 'ExitProcess'
+          dll_module = dll_module || 'kernel32'
         end
       else
         wait_time  = 5
@@ -835,15 +835,19 @@ module Process
             else
               thread_id = FFI::MemoryPointer.new(:ulong)
 
-              thread = CreateRemoteThread(
-                handle,
-                nil,
-                0,
-                GetProcAddress(GetModuleHandle(dll_module), exit_proc),
-                nil,
-                0,
-                thread_id
-              )
+              mod = GetModuleHandle(dll_module)
+
+              if mod == 0
+                raise SystemCallError, FFI.errno, "GetModuleHandle: '#{dll_module}'"
+              end
+
+              proc_addr = GetProcAddress(mod, exit_proc)
+
+              if proc_addr == 0
+                raise SystemCallError, FFI.errno, "GetProcAddress: '#{exit_proc}'"
+              end
+
+              thread = CreateRemoteThread(handle, nil, 0, proc_addr, nil, 0, thread_id)
 
               if thread > 0
                 WaitForSingleObject(thread, wait_time)
@@ -871,4 +875,11 @@ module Process
       bool ? buf.read_string : nil
     end
   end
+end
+
+if $0 == __FILE__
+  pid = Process.spawn("ruby -e 'at_exit{ puts \"DONE\" }; sleep 1 while true'")
+  sleep 1
+  #p Process.kill(1, pid), :ruby_proc => true) #:dll_module => 'bogus', :exit_proc => 'bogus')
+  p Process.kill(1, pid, :dll_module => 'msvcr100-ruby191', :exit_proc => 'rb_f_exit')
 end
