@@ -743,7 +743,7 @@ module Process
         hash = pids.pop
         opts = {}
 
-        valid = %w[exit_proc, dll_module, ruby_proc wait_time]
+        valid = %w[exit_proc dll_module ruby_proc wait_time]
 
         hash.each{ |k,v|
           k = k.to_s.downcase
