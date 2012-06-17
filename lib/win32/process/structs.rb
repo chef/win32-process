@@ -23,7 +23,7 @@ module Process::Structs
       :OtherOperationCount, :ulong_long,
       :ReadTransferCount, :ulong_long,
       :WriteTransferCount, :ulong_long,
-      :OtherTransferCount, :ulong_long,
+      :OtherTransferCount, :ulong_long
     )
   end
 
