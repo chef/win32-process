@@ -707,11 +707,6 @@ module Process
     # :dll_module => The name of the .dll (or .exe) that contains :exit_proc.
     #                The default is 'kernel32'.
     #
-    # :ruby_proc  => If you set this to true then this method assumes you're
-    #                killing a Ruby process and it will set :exit_proc and
-    #                :dll_module to values that will ensure that any at_exit
-    #                hooks are called when the process is killed.
-    #
     # :wait_time  => The time, in milliseconds, to wait for the process to
     #                actually die. The default is 5ms. If you specify 0 here
     #                then the process does not wait if the process is not
@@ -743,7 +738,7 @@ module Process
         hash = pids.pop
         opts = {}
 
-        valid = %w[exit_proc dll_module ruby_proc wait_time]
+        valid = %w[exit_proc dll_module wait_time]
 
         hash.each{ |k,v|
           k = k.to_s.downcase
@@ -753,22 +748,9 @@ module Process
           opts[k] = v
         }
 
-        exit_proc  = opts['exit_proc']
-        dll_module = opts['dll_module']
-        ruby_proc  = opts['ruby_proc']
-        wait_time  = opts['wait_time'] || 5
-
-        # If ruby_proc is true, then use rb_f_exit as the exit_proc and
-        # RUBY_SO_NAME (e.g. msvcrt-ruby191) as the dll_module. However,
-        # we defer to user defined options for both of these first.
-        if ruby_proc
-          require 'rbconfig'
-          exit_proc  = exit_proc  || 'rb_f_exit'
-          dll_module = dll_module || RbConfig::CONFIG['RUBY_SO_NAME']
-        else
-          exit_proc  = exit_proc  || 'ExitProcess'
-          dll_module = dll_module || 'kernel32'
-        end
+        exit_proc  = opts['exit_proc']  || 'ExitProcess'
+        dll_module = opts['dll_module'] || 'kernel32'
+        wait_time  = opts['wait_time']  || 5
       else
         wait_time  = 5
         exit_proc  = 'ExitProcess'
@@ -875,11 +857,4 @@ module Process
       bool ? buf.read_string : nil
     end
   end
-end
-
-if $0 == __FILE__
-  pid = Process.spawn("ruby -e 'at_exit{ puts \"DONE\" }; sleep 1 while true'")
-  sleep 1
-  #p Process.kill(1, pid), :ruby_proc => true) #:dll_module => 'bogus', :exit_proc => 'bogus')
-  p Process.kill(1, pid, :dll_module => 'msvcr100-ruby191', :exit_proc => 'rb_f_exit')
 end
