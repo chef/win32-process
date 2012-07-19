@@ -1117,7 +1117,7 @@ module Process
     startinfo = startinfo.pack('LLLLLLLLLLLLSSLLLL')
     procinfo  = [0,0,0,0].pack('LLLL')
 
-    rv = CreateProcess(0, cmd, 0, 0, 1, 0, 0, 0, startinfo, procinfo)
+    rv = CreateProcess(nil, cmd, 0, 0, 1, 0, 0, 0, startinfo, procinfo)
 
     if rv == 0
       raise Error, get_last_error
