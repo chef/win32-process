@@ -1,3 +1,9 @@
+= 0.6.6 - ???
+* Fixed a param bug in the Process.fork method caused by a prototype change
+  in the Windows::Process library of the windows-pr gem. Thanks go to
+  mzverev for the spot.
+* Updated the gemspec, including updates to the windows-pr dependency.
+
 = 0.6.5 - 27-Dec-2010
 * Fixed getpriority and setpriority so that the underlying process handle is
   always closed. Thanks go to Rafal Michalski	for the spot and patch. 

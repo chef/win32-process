@@ -21,7 +21,7 @@ module Process
   undef_method :setpriority, :wait, :wait2, :waitpid, :waitpid2, :uid
 
   # The version of the win32-process library
-  WIN32_PROCESS_VERSION = '0.6.5'
+  WIN32_PROCESS_VERSION = '0.6.6'
 
   # Defined for interface compatibility, but not used
 

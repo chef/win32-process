@@ -11,21 +11,18 @@
 #
 # You should run this test case via the 'rake test' task.
 ###############################################################################
-require 'rubygems'
-gem 'test-unit'
-
-require 'test/unit'
+require 'test-unit'
 require 'win32/process'
 require 'sys/proctable'
 
-class TC_Win32Process < Test::Unit::TestCase  
+class TC_Win32Process < Test::Unit::TestCase
 
   # Start two instances of notepad and give them a chance to fire up
   def self.startup
     IO.popen('notepad')
     IO.popen('notepad')
     sleep 1 # Give the notepad instances a second to startup
-      
+
     @@pids = []
 
     Sys::ProcTable.ps{ |struct|
@@ -37,15 +34,15 @@ class TC_Win32Process < Test::Unit::TestCase
   def setup
     @pri_class = Process::NORMAL_PRIORITY_CLASS
   end
-  
+
   test "win32-process version is set to the correct value" do
-    assert_equal('0.6.5', Process::WIN32_PROCESS_VERSION)
+    assert_equal('0.6.6', Process::WIN32_PROCESS_VERSION)
   end
-   
+
   test "kill basic functionality" do
     assert_respond_to(Process, :kill)
   end
-   
+
   test "kill requires at least one argument" do
     assert_raises(ArgumentError){ Process.kill }
   end
@@ -57,19 +54,19 @@ class TC_Win32Process < Test::Unit::TestCase
   test "kill raises an error if an invalid process id is provided" do
     assert_raises(Process::Error){ Process.kill(0, 9999999) }
   end
-   
+
   test "kill with signal 0 does not kill the process" do
     pid = @@pids.first
     assert_nothing_raised{ Process.kill(0, pid) }
     assert_not_nil(Sys::ProcTable.ps(pid))
   end
-   
+
   test "kill with signal 1 kills the process normally" do
     pid = @@pids.shift
     assert_nothing_raised{ Process.kill(1, pid) }
     assert_nil(Sys::ProcTable.ps(pid))
   end
-   
+
   test "kill with signal 9 kills the process brutally" do
     pid = @@pids.pop
     msg = "Could not find pid #{pid}"
@@ -80,7 +77,7 @@ class TC_Win32Process < Test::Unit::TestCase
   test "fork basic functionality" do
     assert_respond_to(Process, :fork)
   end
-      	
+
   test "create basic functionality" do
     assert_respond_to(Process, :create)
   end
@@ -98,7 +95,7 @@ class TC_Win32Process < Test::Unit::TestCase
 
     assert_nothing_raised{ Process.kill(1, @@pids.pop) }
   end
-   
+
   test "create requires a hash argument" do
     assert_raise(TypeError){ Process.create("bogusapp.exe") }
   end
@@ -124,19 +121,19 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_raise(Process::Error){ Process.create(:app_name => "bogusapp.exe") }
     assert_raise_message(err){ Process.create(:app_name => "bogusapp.exe") }
   end
-   
+
   test "wait basic functionality" do
     assert_respond_to(Process, :wait)
   end
-   
+
   test "wait2 basic functionality" do
     assert_respond_to(Process, :wait2)
   end
-   
+
   test "waitpid basic functionality" do
     assert_respond_to(Process, :waitpid)
   end
-   
+
   test "waitpid2 basic functionality" do
     assert_respond_to(Process, :waitpid2)
   end
@@ -151,19 +148,19 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_true(Process.ppid > 0)
     assert_false(Process.pid == Process.ppid)
   end
-   
+
   test "uid basic functionality" do
     assert_respond_to(Process, :uid)
     assert_kind_of(Fixnum, Process.uid)
   end
 
-  test "uid accepts a boolean argument" do  
+  test "uid accepts a boolean argument" do
     assert_nothing_raised{ Process.uid(true) }
     assert_nothing_raised{ Process.uid(true) }
   end
 
   test "uid returns a string if its argument is true" do
-    assert_kind_of(String, Process.uid(true))      
+    assert_kind_of(String, Process.uid(true))
   end
 
   test "uid accepts a maximum of one argument" do
@@ -284,7 +281,7 @@ class TC_Win32Process < Test::Unit::TestCase
   test "is_job does not accept any arguments" do
     assert_raise(ArgumentError){ Process.job?(Process.pid) }
   end
-   
+
   def teardown
     @pri_class = nil
   end
