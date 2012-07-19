@@ -1,4 +1,4 @@
-= 0.6.6 - ???
+= 0.6.6 - 19-Jul-2012
 * Fixed a param bug in the Process.fork method caused by a prototype change
   in the Windows::Process library of the windows-pr gem. Thanks go to
   mzverev for the spot.
