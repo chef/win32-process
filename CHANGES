@@ -6,6 +6,8 @@
   no longer have custom implementations either. These also proved to be
   somewhat problematic with Ruby 1.9.x anyway.
 * Removed the custom Process.ppid method because Ruby 1.9.x now supports it.
+* The Process.kill method now supports the :exit_proc, :dll_module and
+  :wait_time options for signals 1 and 4-8.
 
 = 0.6.5 - 27-Dec-2010
 * Fixed getpriority and setpriority so that the underlying process handle is
