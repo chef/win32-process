@@ -696,8 +696,21 @@ module Process
 
     remove_method :kill
 
+    # Kill a given process with a specific signal. This overrides the default
+    # implementation of Process.kill. The differences mainly reside in the way
+    # it kills processes, but this version also gives you finer control over
+    # behavior.
     #
-    # Process.kill(1, 12345, :exit_proc => 'ExitProcess', :module => 'kernel32')
+    # Internally, signals 2 and 3 will generate a console control event, using
+    # a ctrl-c or ctrl-break event, respectively. Signal 9 terminates the
+    # process harshly, given that process no chance to do any internal cleanup.
+    # Signals 1 and 4-8 kill the process more nicely, giving the process a
+    # chance to do internal cleanup before being killed. Signal 0 behaves the
+    # same as the default implementation.
+    #
+    # When using signals 1 or 4-8 you may specify additional options that
+    # allow finer control over how that process is killed and how your program
+    # behaves.
     #
     # Possible options for signals 1 and 4-8.
     #
@@ -713,6 +726,10 @@ module Process
     #                signaled and instead returns immediately. Alternatively,
     #                you may specify Process::INFINITE, and your code will
     #                block until the process is actually signaled.
+    #
+    # Example:
+    #
+    #   Process.kill(1, 12345, :exit_proc => 'ExitProcess', :module => 'kernel32')
     #
     def kill(signal, *pids)
       # Match the spec, signal may not be less than zero if numeric
