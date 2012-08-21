@@ -4,8 +4,6 @@
 * Rakefile
 * win32-process.gemspec
 * examples/example_create.rb
-* examples/example_fork_wait.rb
-* examples/example_fork_waitpid.rb
 * examples/example_kill.rb
 * lib/win32/process.rb
 * test/test_process.rb
