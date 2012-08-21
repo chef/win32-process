@@ -81,6 +81,7 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
 
   test "kill requires at least two arguments" do
     assert_raise(ArgumentError){ Process.kill }
+    assert_raise(ArgumentError){ Process.kill(@pid) }
   end
 
   test "the first argument to kill must be an integer or string" do

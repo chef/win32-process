@@ -732,6 +732,11 @@ module Process
     #   Process.kill(1, 12345, :exit_proc => 'ExitProcess', :module => 'kernel32')
     #
     def kill(signal, *pids)
+      # Match the spec, require at least 2 arguments
+      if pids.length == 0
+        raise ArgumentError, "wrong number of arguments (1 for at least 2)"
+      end
+
       # Match the spec, signal may not be less than zero if numeric
       if signal.is_a?(Numeric) && signal < 0 # EINVAL
         raise SystemCallError.new(22)
