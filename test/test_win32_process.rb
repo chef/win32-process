@@ -264,17 +264,17 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "setrlimit basic functionality" do
-    assert_respond_to(Process, :getrlimit)
-    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) }
+    assert_respond_to(Process, :setrlimit)
+    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
   end
 
   test "setrlimit returns nil on success" do
-    assert_nil(Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4))
+    assert_nil(Process.setrlimit(Process::RLIMIT_CPU, 1000000))
   end
 
   test "setrlimit sets the resource limit as expected" do
-    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) }
-    assert_equal([4096, 4096], Process.getrlimit(Process::RLIMIT_VMEM))
+    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
+    assert_equal([1000000, 1000000], Process.getrlimit(Process::RLIMIT_CPU))
   end
 
   test "setrlimit raises an error if the resource value is invalid" do
