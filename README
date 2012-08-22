@@ -1,7 +1,7 @@
 = Description
   This library provides analogues of the :getpriority, :setpriority, :getrlimit,
-  and :setrlimit methods for MS Windows. It also adds the new methods :job?,
-  :get_affinity, and :create.
+  :setrlimit and :uid methods for MS Windows. It also adds the new methods :job?,
+  :get_affinity, and :create, and redefines the :kill method.
  
 = Prerequisites
   * ffi
@@ -45,23 +45,11 @@
    to follow in the footsteps of ActiveState Perl, which uses native threads
    to simulate fork on Windows.
 	
-== The removal of the custom Process.kill method
-   We added the Process.kill method originally because it wasn't supported
-   at all back in the bad old Ruby 1.6 days. It was added in Ruby 1.8, but
-   the implementation was (and still is) not particularly good.
-
-   The problem is that there is no nice way to kill a process on Windows
-   with Ruby, i.e. exit handlers are bypassed in the same manner as a
-   "kill -9" on Unix systems. We decided to implement a nicer way to kill
-   processes when not using signal 9 that would still allow processes to
-   perform cleanup before terminating.
-
-   However, we also implemented slightly different semantics for how multiple
-   pids are handled if the kill attempt on any one of them fails. Originally
-   I wanted the MRI core team to adopt our approach, but that never happened
-   and now I worry about compatibility issues. On top of that I really think
-   this is something that ought to be fixed in core Ruby, so I've decided to
-   remove this crutch and try to force the issue.
+== Changes in the custom Process.kill method for 0.7.0
+   The Process.kill method in 0.7.0 more closely matches the spec now, but
+   the internal method for killing processes is still nicer for most signals.
+   With the release of 0.7.0 users can now specify options that provide finer
+   control over how a process is killed. See the documentation for details. 
 
 == The removal of the custom Process.ppid method
    This was added at some point in the Ruby 1.9 dev cycle so it was removed
