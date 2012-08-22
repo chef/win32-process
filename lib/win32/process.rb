@@ -359,7 +359,6 @@ module Process
           end
         end
 
-        # sizeof(struct JOBJECT_EXTENDED_LIMIT_INFORMATION)
         ptr = JOBJECT_EXTENDED_LIMIT_INFORMATION.new
 
         # Set the LimitFlags and relevant members of the struct
