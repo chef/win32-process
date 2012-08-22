@@ -567,7 +567,7 @@ module Process
               errno = FFI.errno
             end
 
-            raise SystemCallError, errno, "get_osfhandle"
+            raise SystemCallError.new("get_osfhandle", errno)
           end
 
           # Most implementations of Ruby on Windows create inheritable
@@ -578,7 +578,7 @@ module Process
             HANDLE_FLAG_INHERIT
           )
 
-          raise SystemCallError, FFI.errno, "SetHandleInformation" unless bool
+          raise SystemCallError.new("SetHandleInformation", FFI.errno) unless bool
 
           si_hash[io] = handle
           si_hash['startf_flags'] ||= 0
@@ -655,7 +655,7 @@ module Process
         )
 
         unless bool
-          raise SystemCallError, FFI.errno, "CreateProcessWithLogonW"
+          raise SystemCallError.new("CreateProcessWithLogonW", FFI.errno)
         end
       else
         inherit  = hash['inherit'] || false
@@ -674,7 +674,7 @@ module Process
         )
 
         unless bool
-          raise SystemCallError, FFI.errno, "CreateProcess"
+          raise SystemCallError.new("CreateProcess", FFI.errno)
         end
       end
 
@@ -821,19 +821,19 @@ module Process
               if GenerateConsoleCtrlEvent(CTRL_C_EVENT, pid)
                 count += 1
               else
-                raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
+                raise SystemCallError.new("GenerateConsoleCtrlEvent", FFI.errno)
               end
             when Signal.list['BRK'], 'BRK', 'SIGBRK', :BRK, :SIGBRK, 3
               if GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pid)
                 count += 1
               else
-                raise SystemCallError, FFI.errno, "GenerateConsoleCtrlEvent"
+                raise SystemCallError.new("GenerateConsoleCtrlEvent", FFI.errno)
               end
             when Signal.list['KILL'], 'KILL', 'SIGKILL', :KILL, :SIGKILL, 9
               if TerminateProcess(handle, pid)
                 count += 1
               else
-                raise SystemCallError, FFI.errno, "TerminateProcess"
+                raise SystemCallError.new("TerminateProcess", FFI.errno)
               end
             else
               thread_id = FFI::MemoryPointer.new(:ulong)
@@ -841,13 +841,13 @@ module Process
               mod = GetModuleHandle(dll_module)
 
               if mod == 0
-                raise SystemCallError, FFI.errno, "GetModuleHandle: '#{dll_module}'"
+                raise SystemCallError.new("GetModuleHandle: '#{dll_module}'", FFI.errno)
               end
 
               proc_addr = GetProcAddress(mod, exit_proc)
 
               if proc_addr == 0
-                raise SystemCallError, FFI.errno, "GetProcAddress: '#{exit_proc}'"
+                raise SystemCallError.new("GetProcAddress: '#{exit_proc}'", FFI.errno)
               end
 
               thread = CreateRemoteThread(handle, nil, 0, proc_addr, nil, 0, thread_id)
@@ -856,7 +856,7 @@ module Process
                 WaitForSingleObject(thread, wait_time)
                 count += 1
               else
-                raise SystemCallError, FFI.errno, "CreateRemoteThread"
+                raise SystemCallError.new("CreateRemoteThread", FFI.errno)
               end
           end
         ensure
