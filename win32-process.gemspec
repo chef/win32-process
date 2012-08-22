@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.license    = 'Artistic 2.0'
   spec.authors    = ['Daniel Berger', 'Park Heesob']
   spec.email      = 'djberg96@gmail.com'
-  spec.homepage   = 'http://www.rubyforge.org/projects/win32utils'
+  spec.homepage   = 'https://github.com/djberg96/win32-process'
   spec.summary    = 'Adds and redefines several Process methods for MS Windows'
   spec.test_files = Dir['test/*.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.description = <<-EOF
     The win32-process library implements several Process methods that are
     either unimplemented or dysfunctional in some way in the default Ruby
-    implementation. Examples include Process.kill, Process.waitpid,
-    Process.create and an experimental Process.fork method.
+    implementation. Examples include Process.kill, Process.uid and
+    Process.create.
   EOF
 end
