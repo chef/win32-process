@@ -1,4 +1,4 @@
-= 0.7.0 - ???
+= 0.7.0 - 22-Aug-2012
 * Converted to use FFI instead of win32-api.
 * Now requires Ruby 1.9.x or later.
 * Removed the experimental Process.fork function. This obviated the necessity
