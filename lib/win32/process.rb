@@ -10,7 +10,8 @@ module Process
   extend Process::Structs
   extend Process::Constants
 
-  WIN32_PROCESS_VERSION = '0.7.0'
+  # The version of the win32-process library.
+  WIN32_PROCESS_VERSION = '0.7.1'
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
