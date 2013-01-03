@@ -25,6 +25,7 @@ module Process::Functions
   attach_pfunc :GetProcessAffinityMask, [:ulong, :pointer, :pointer], :bool
   attach_pfunc :GetPriorityClass, [:ulong], :ulong
   attach_pfunc :GetProcAddress, [:ulong, :string], :ulong
+  attach_pfunc :GetVersionExA, [:pointer], :bool
   attach_pfunc :IsProcessInJob, [:ulong, :pointer, :pointer], :void
   attach_pfunc :OpenProcess, [:ulong, :bool, :ulong], :ulong
   attach_pfunc :SetHandleInformation, [:ulong, :ulong, :ulong], :bool
@@ -61,6 +62,11 @@ module Process::Functions
 
   ffi_lib FFI::Library::LIBC
 
-  attach_pfunc :get_errno, :_get_errno, [:pointer], :int
   attach_pfunc :get_osfhandle, :_get_osfhandle, [:int], :ulong
+
+  begin
+    attach_pfunc :get_errno, :_get_errno, [:pointer], :int
+  rescue FFI::NotFoundError
+    # Do nothing, Windows XP or earlier.
+  end
 end

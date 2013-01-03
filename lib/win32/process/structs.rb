@@ -93,6 +93,17 @@ module Process::Structs
     )
   end
 
+  class OSVERSIONINFO < FFI::Struct
+    layout(
+      :dwOSVersionInfoSize, :ulong,
+      :dwMajorVersion, :ulong,
+      :dwMinorVersion, :ulong,
+      :dwBuildNumber, :ulong,
+      :dwPlatformId, :ulong,
+      :szCSDVersion, [:char, 128]
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,

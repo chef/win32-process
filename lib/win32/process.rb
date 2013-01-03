@@ -561,7 +561,7 @@ module Process
           if handle == INVALID_HANDLE_VALUE
             ptr = FFI::MemoryPointer.new(:int)
 
-            if get_errno(ptr) == 0
+            if windows_version >= 6 && get_errno(ptr) == 0
               errno = ptr.read_int
             else
               errno = FFI.errno
@@ -876,6 +876,18 @@ module Process
       buf = FFI::MemoryPointer.new(:char, 32)
       bool = GetVolumeInformationA(nil, nil, 0, nil, nil, nil, buf, buf.size)
       bool ? buf.read_string : nil
+    end
+
+    # Private method that returns the Windows major version number.
+    def windows_version
+      ver = OSVERSIONINFO.new
+      ver[:dwOSVersionInfoSize] = ver.size
+
+      unless GetVersionExA(ver)
+        raise SystemCallError.new("GetVersionEx", FFI.errno)
+      end
+
+      ver[:dwMajorVersion]
     end
   end
 end
