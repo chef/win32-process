@@ -29,7 +29,7 @@ module Process::Functions
   attach_pfunc :GetModuleHandle, :GetModuleHandleA, [:string], :hmodule
   attach_pfunc :GetProcessAffinityMask, [:handle, :pointer, :pointer], :bool
   attach_pfunc :GetPriorityClass, [:handle], :dword
-  attach_pfunc :GetProcAddress, [:hmodule, :string], :ulong
+  attach_pfunc :GetProcAddress, [:hmodule, :string], :pointer
   attach_pfunc :GetVersionExA, [:pointer], :bool
   attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
   attach_pfunc :OpenProcess, [:dword, :bool, :dword], :handle
@@ -40,7 +40,7 @@ module Process::Functions
   attach_pfunc :WaitForSingleObject, [:handle, :dword], :dword
 
   attach_pfunc :CreateRemoteThread,
-    [:handle, :pointer, :size_t, :ulong, :pointer, :dword, :pointer], :handle
+    [:handle, :pointer, :size_t, :pointer, :pointer, :dword, :pointer], :handle
 
   attach_pfunc :GetVolumeInformationA,
     [:string, :pointer, :dword, :pointer, :pointer, :pointer, :pointer, :dword], :bool
