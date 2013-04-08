@@ -8,6 +8,10 @@ require 'ffi'
 module Process::Structs
   extend FFI::Library
 
+  typedef :ulong, :dword
+  typedef :uintptr_t, :handle
+  typedef :short, :word
+
   private
 
   # sizeof(LARGE_INTEGER) == 8
@@ -31,13 +35,13 @@ module Process::Structs
     layout(
       :PerProcessUserTimeLimit, LARGE_INTEGER,
       :PerJobUserTimeLimit, LARGE_INTEGER,
-      :LimitFlags, :ulong,
+      :LimitFlags, :dword,
       :MinimumWorkingSetSize, :size_t,
       :MaximumWorkingSetSize, :size_t,
-      :ActiveProcessLimit, :ulong,
+      :ActiveProcessLimit, :dword,
       :Affinity, :pointer,
-      :PriorityClass, :ulong,
-      :SchedulingClass, :ulong
+      :PriorityClass, :dword,
+      :SchedulingClass, :dword
     )
   end
 
@@ -54,7 +58,7 @@ module Process::Structs
 
   class SECURITY_ATTRIBUTES < FFI::Struct
     layout(
-      :nLength, :ulong,
+      :nLength, :dword,
       :lpSecurityDescriptor, :pointer,
       :bInheritHandle, :bool
     )
@@ -67,27 +71,27 @@ module Process::Structs
       :lpReserved, :string,
       :lpDesktop, :string,
       :lpTitle, :string,
-      :dwX, :ulong,
-      :dwY, :ulong,
-      :dwXSize, :ulong,
-      :dwYSize, :ulong,
-      :dwXCountChars, :ulong,
-      :dwYCountChars, :ulong,
-      :dwFillAttribute, :ulong,
-      :dwFlags, :ulong,
-      :wShowWindow, :short,
-      :cbReserved2, :short,
+      :dwX, :dword,
+      :dwY, :dword,
+      :dwXSize, :dword,
+      :dwYSize, :dword,
+      :dwXCountChars, :dword,
+      :dwYCountChars, :dword,
+      :dwFillAttribute, :dword,
+      :dwFlags, :dword,
+      :wShowWindow, :word,
+      :cbReserved2, :word,
       :lpReserved2, :pointer,
-      :hStdInput, :ulong,
-      :hStdOutput, :ulong,
-      :hStdError, :ulong
+      :hStdInput, :handle,
+      :hStdOutput, :handle,
+      :hStdError, :handle
     )
   end
 
   class PROCESS_INFORMATION < FFI::Struct
     layout(
-      :hProcess, :ulong,
-      :hThread, :ulong,
+      :hProcess, :handle,
+      :hThread, :handle,
       :dwProcessId, :ulong,
       :dwThreadId, :ulong
     )
@@ -95,11 +99,11 @@ module Process::Structs
 
   class OSVERSIONINFO < FFI::Struct
     layout(
-      :dwOSVersionInfoSize, :ulong,
-      :dwMajorVersion, :ulong,
-      :dwMinorVersion, :ulong,
-      :dwBuildNumber, :ulong,
-      :dwPlatformId, :ulong,
+      :dwOSVersionInfoSize, :dword,
+      :dwMajorVersion, :dword,
+      :dwMinorVersion, :dword,
+      :dwBuildNumber, :dword,
+      :dwPlatformId, :dword,
       :szCSDVersion, [:char, 128]
     )
   end
