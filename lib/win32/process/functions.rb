@@ -54,6 +54,7 @@ module Process::Functions
   attach_pfunc :OpenJobObjectA, [:dword, :bool, :string], :handle
   attach_pfunc :QueryInformationJobObject, [:handle, :int, :pointer, :dword, :pointer], :bool
   attach_pfunc :SetInformationJobObject, [:handle, :int, :pointer, :dword], :bool
+  attach_pfunc :GetExitCodeProcess, [:handle, :pointer], :bool
 
   ffi_lib :advapi32
 

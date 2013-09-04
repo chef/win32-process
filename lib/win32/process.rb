@@ -867,6 +867,36 @@ module Process
 
       count
     end
+
+    # Returns the exitcode of the process with given +pid+ or nil if the process
+    # is still running. Note that the process doesn't have to be a child process.
+    # 
+    # This method is very handy for finding out, if a process started with Process.create
+    # is still running. The usual way of calling Process.wait doesn't work when
+    # the process isn't recognized as a child process (ECHILD). This happens for example
+    # when stdin, stdout or stderr are set to custom values.
+    #
+    def get_exitcode(pid)
+      handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid)
+
+      if handle == INVALID_HANDLE_VALUE
+        raise SystemCallError, FFI.errno, "OpenProcess"
+      end
+
+      buf = FFI::MemoryPointer.new(:ulong, 1)
+      unless GetExitCodeProcess(handle, buf)
+        raise SystemCallError, FFI.errno, "GetExitCodeProcess"
+      end
+
+      CloseHandle(handle)
+
+      exitcode = buf.read_int 
+      if exitcode == STILL_ACTIVE
+        nil
+      else
+        exitcode
+      end
+    end
   end
 
   class << self
