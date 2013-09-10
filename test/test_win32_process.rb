@@ -309,6 +309,38 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_not_respond_to(Process, :SetPriorityClass)
   end
 
+  test "get_exitcode basic functionality" do
+    assert_respond_to(Process, :get_exitcode)
+  end
+
+  test "get_exitcode returns the process exit code" do
+    pid = Process.create(
+      :app_name         => 'cmd /c exit 7',
+      :creation_flags   => Process::DETACHED_PROCESS
+    ).process_id
+    10.times do
+      sleep(0.1)
+      break if Process.get_exitcode(pid)
+    end
+    assert_equal 7, Process.get_exitcode(pid)
+  end
+
+  test "get_exitcode returns nil while the process is running" do
+    stdin_read, stdin_write = IO.pipe
+    pid = Process.create(
+      :app_name         => 'cmd /c pause',
+      :creation_flags   => Process::DETACHED_PROCESS,
+      :startup_info     => { :stdin => stdin_read }
+    ).process_id
+    assert_equal nil, Process.get_exitcode(pid)
+    stdin_write.write("\n")
+    10.times do
+      sleep(0.1)
+      break if Process.get_exitcode(pid)
+    end
+    assert_equal 1, Process.get_exitcode(pid)
+  end
+
   def teardown
     @priority = nil
   end
