@@ -61,8 +61,8 @@ module Process
         begin
           handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0 , int)
 
-          if handle == INVALID_HANDLE_VALUE
-            raise SystemCallError, FFI.errno, "OpeProcess"
+          if handle == 0
+            raise SystemCallError, FFI.errno, "OpenProcess"
           end
 
           unless GetProcessAffinityMask(handle, pmask, smask)
@@ -102,7 +102,7 @@ module Process
 
       handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, int)
 
-      if handle == INVALID_HANDLE_VALUE
+      if handle == 0
         raise SystemCallError, FFI.errno, "OpenProcess"
       end
 
@@ -144,7 +144,7 @@ module Process
 
       handle = OpenProcess(PROCESS_SET_INFORMATION, false , int)
 
-      if handle == INVALID_HANDLE_VALUE
+      if handle == 0
         raise SystemCallError, FFI.errno, "OpenProcess"
       end
 
@@ -879,7 +879,7 @@ module Process
     def get_exitcode(pid)
       handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid)
 
-      if handle == INVALID_HANDLE_VALUE
+      if handle == 0
         raise SystemCallError, FFI.errno, "OpenProcess"
       end
 
