@@ -870,8 +870,8 @@ module Process
 
     # Returns the exitcode of the process with given +pid+ or nil if the process
     # is still running. Note that the process doesn't have to be a child process.
-    # 
-    # This method is very handy for finding out, if a process started with Process.create
+    #
+    # This method is very handy for finding out if a process started with Process.create
     # is still running. The usual way of calling Process.wait doesn't work when
     # the process isn't recognized as a child process (ECHILD). This happens for example
     # when stdin, stdout or stderr are set to custom values.
@@ -880,17 +880,21 @@ module Process
       handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid)
 
       if handle == INVALID_HANDLE_VALUE
-        raise SystemCallError, FFI.errno, "OpenProcess"
+        raise SystemCallError.new("OpenProcess", FFI.errno)
       end
 
-      buf = FFI::MemoryPointer.new(:ulong, 1)
-      unless GetExitCodeProcess(handle, buf)
-        raise SystemCallError, FFI.errno, "GetExitCodeProcess"
+      begin
+        buf = FFI::MemoryPointer.new(:ulong, 1)
+
+        unless GetExitCodeProcess(handle, buf)
+          raise SystemCallError.new("GetExitCodeProcess", FFI.errno)
+        end
+      ensure
+        CloseHandle(handle)
       end
 
-      CloseHandle(handle)
+      exitcode = buf.read_int
 
-      exitcode = buf.read_int 
       if exitcode == STILL_ACTIVE
         nil
       else
