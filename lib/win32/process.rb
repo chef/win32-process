@@ -11,7 +11,7 @@ module Process
   extend Process::Constants
 
   # The version of the win32-process library.
-  WIN32_PROCESS_VERSION = '0.7.2'
+  WIN32_PROCESS_VERSION = '0.7.3'
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
@@ -36,10 +36,10 @@ module Process
     #
     # Example:
     #
-    #    # System has 4 processors, current process is allowed to run on all
+    #    # System has 4 processors, current process is allowed to run on all.
     #    Process.get_affinity # => [[15], [15]], where '15' is 1 + 2 + 4 + 8
     #
-    #    # System has 4 processors, current process only allowed on 1 and 4 only
+    #    # System has 4 processors, current process only allowed on 1 and 4.
     #    Process.get_affinity # => [[9], [15]]
     #
     # If you want to convert a decimal bit vector into an array of 0's and 1's
@@ -457,6 +457,13 @@ module Process
     #
     # If the 'with_logon' option is set, then the process runs the specified
     # executable file in the security context of the specified credentials.
+    #
+    # To simulate Process.wait you can use this approach:
+    #
+    #   sleep 0.1 while !Process.get_exitcode(info.process_id)
+    #
+    # If you really to use Process.wait, then you should use the
+    # Process.spawn method instead of Process.create where possible.
     #
     def create(args)
       unless args.kind_of?(Hash)
