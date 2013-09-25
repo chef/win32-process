@@ -194,12 +194,12 @@ module Process
         raise SystemCallError, FFI.errno, "GetTokenInformation"
       end
 
-      string_sid = tuser[8, (rlength.read_ulong - 8)]
+      string_sid = tuser[FFI.type_size(:pointer)*2, (rlength.read_ulong - FFI.type_size(:pointer)*2)]
 
       if sid
         string_sid
       else
-        psid = FFI::MemoryPointer.new(:ulong)
+        psid = FFI::MemoryPointer.new(:uintptr_t)
 
         unless ConvertSidToStringSidA(string_sid, psid)
           raise SystemCallError, FFI.errno, "ConvertSidToStringSid"
