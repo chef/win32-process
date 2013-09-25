@@ -1,3 +1,10 @@
+= 0.7.3 - 25-Sep-2013
+* Added the Process.get_exitcode method. Thanks go to mthiede for the patch.
+* The Process.kill method raises a SecurityError if the $SAFE level is 2
+  or higher. This was done to match the spec.
+* A note was added to use the Process.spawn method instead of Process.create
+  method where practical.
+
 = 0.7.2 - 8-Apr-2013
 * Fixed a 64 bit issue caused by the fact that HANDLE's were set as ulong
   instead of intptr_t. Thanks go to Crossverse the spot.
