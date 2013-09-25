@@ -2,6 +2,7 @@
 * Added the Process.get_exitcode method. Thanks go to mthiede for the patch.
 * The Process.kill method raises a SecurityError if the $SAFE level is 2
   or higher. This was done to match the spec.
+* Fixed a bug in our custom Process.uid method that affected 64-bit Ruby.
 * A note was added to use the Process.spawn method instead of Process.create
   method where practical.
 
