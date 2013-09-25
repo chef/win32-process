@@ -25,7 +25,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "win32-process version is set to the correct value" do
-    assert_equal('0.7.2', Process::WIN32_PROCESS_VERSION)
+    assert_equal('0.7.3', Process::WIN32_PROCESS_VERSION)
   end
 
   test "create basic functionality" do
