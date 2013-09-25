@@ -132,6 +132,7 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
     }
   end
 
+=begin
   test "kill(0) can't tell if the process ended, use get_exitcode instead" do
     pid = Process.create(
       :app_name         => 'cmd /c exit 0',
@@ -144,6 +145,7 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
       end
     end
   end
+=end
 
   def teardown
     @cmd  = nil
