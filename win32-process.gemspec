@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'win32-process'
-  spec.version    = '0.7.3'
+  spec.version    = '0.7.4'
   spec.license    = 'Artistic 2.0'
   spec.authors    = ['Daniel Berger', 'Park Heesob']
   spec.email      = 'djberg96@gmail.com'
@@ -16,6 +16,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '> 1.9.0'
   spec.add_dependency('ffi', '>= 1.0.0')
+
+  spec.add_development_dependency('rake')
   spec.add_development_dependency('test-unit', '>= 2.4.0')
 
   spec.description = <<-EOF
