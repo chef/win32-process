@@ -6,4 +6,8 @@
 * examples/example_create.rb
 * examples/example_kill.rb
 * lib/win32/process.rb
+* lib/win32/process/constants.rb
+* lib/win32/process/functions.rb
+* lib/win32/process/helper.rb
+* lib/win32/process/structs.rb
 * test/test_process.rb
