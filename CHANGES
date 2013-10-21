@@ -1,3 +1,7 @@
+= 0.7.4 - 21-Oct-2013
+* Fixed the INVALID_HANDLE_VALUE constant for 64-bit versions of Ruby.
+* Added Rake as a development dependency.
+
 = 0.7.3 - 25-Sep-2013
 * Added the Process.get_exitcode method. Thanks go to mthiede for the patch.
 * The Process.kill method raises a SecurityError if the $SAFE level is 2
