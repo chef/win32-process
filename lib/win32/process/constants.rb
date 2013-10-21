@@ -1,4 +1,8 @@
+require 'ffi'
+
 module Process::Constants
+  include FFI::Library
+
   private
 
   # Priority constants
@@ -12,7 +16,7 @@ module Process::Constants
 
   # Error constants
 
-  INVALID_HANDLE_VALUE = 0xffffffff
+  INVALID_HANDLE_VALUE = FFI::Pointer.new(-1).address
   ERROR_ACCESS_DENIED  = 0x00000005
 
   # Process Access Rights
@@ -106,5 +110,4 @@ module Process::Constants
   # GetExitCodeProcess
 
   STILL_ACTIVE = 259
-
 end
