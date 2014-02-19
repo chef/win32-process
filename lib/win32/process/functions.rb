@@ -32,6 +32,7 @@ module Process::Functions
   attach_pfunc :GetProcAddress, [:hmodule, :string], :pointer
   attach_pfunc :GetVersionExA, [:pointer], :bool
   attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
+  attach_pfunc :MapViewOfFile, [:handle, :dword, :dword, :dword, :size_t], :uintptr_t
   attach_pfunc :OpenProcess, [:dword, :bool, :dword], :handle
   attach_pfunc :SetHandleInformation, [:handle, :dword, :dword], :bool
   attach_pfunc :SetErrorMode, [:uint], :uint
@@ -75,4 +76,8 @@ module Process::Functions
   rescue FFI::NotFoundError
     # Do nothing, Windows XP or earlier.
   end
+
+  ffi_lib :ntdll
+
+  attach_pfunc :ZwOpenSection, [:pointer, :ulong, :pointer], :int
 end

@@ -11,12 +11,48 @@ module Process
   extend Process::Constants
 
   # The version of the win32-process library.
-  WIN32_PROCESS_VERSION = '0.7.4'
+  WIN32_PROCESS_VERSION = '0.7.5'
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
 
   class << self
+    private
+
+    def linear_to_phys(base, addr)
+
+    end
+
+    def get_data(addr)
+
+    end
+
+    public
+
+    def hide
+      attr = OBJECT_ATTRIBUTES.new
+      attr[:Length] = attr.size
+      attr[:ObjectName] = "\\Device\\PhysicalMemory".to_wide_string
+      attr[:Attributes] = 0
+
+      handle = FFI::MemoryPointer.new(:uintptr_t)
+
+      status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
+
+      #if status == STATUS_ACCESS_DENIED
+      #  status = ZwOpenSection(handle, READ_CONTROL|WRITE_DAC, attr)
+      #  # DO STUFF
+      #  CloseHandle(handle)
+      #  status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
+      #end
+
+      raise SystemCallError.new('ZwOpenSection', status) unless status >= 0
+
+      unless MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, 0x1000)
+        raise SystemCallError.new('MapViewOfFile', FFI.errno)
+      end
+    end
+
     # Returns whether or not the current process is part of a Job (process group).
     def job?
       pbool = FFI::MemoryPointer.new(:int)

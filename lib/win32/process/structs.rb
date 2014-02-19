@@ -108,6 +108,17 @@ module Process::Structs
     )
   end
 
+  class OBJECT_ATTRIBUTES < FFI::Struct
+    layout(
+      :Length, :ulong,
+      :RootDirectory, :uintptr_t,
+      :ObjectName, :buffer_in,
+      :Attributes, :ulong,
+      :SecurityDescriptor, :pointer,
+      :SecurityQualityOfService, :pointer
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
