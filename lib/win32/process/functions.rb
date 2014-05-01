@@ -60,8 +60,11 @@ module Process::Functions
   ffi_lib :advapi32
 
   attach_pfunc :ConvertSidToStringSidA, [:buffer_in, :pointer], :bool
+  attach_pfunc :GetSecurityInfo, [:handle, :dword, :dword, :ptr, :ptr, :ptr, :ptr, :ptr], :dword
   attach_pfunc :GetTokenInformation, [:handle, :int, :pointer, :dword, :pointer], :bool
   attach_pfunc :OpenProcessToken, [:handle, :dword, :pointer], :bool
+  attach_pfunc :SetEntriesInAcl, [:ulong, :pointer, :pointer, :pointer], :dword
+  attach_pfunc :SetSecurityInfo, [:handle, :int, :dword, :ptr, :ptr, :ptr, :ptr], :dword
 
   attach_pfunc :CreateProcessWithLogonW,
     [:buffer_in, :buffer_in, :buffer_in, :dword, :buffer_in, :buffer_in,

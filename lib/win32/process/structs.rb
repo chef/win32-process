@@ -119,6 +119,25 @@ module Process::Structs
     )
   end
 
+  class TRUSTEE < FFI::Struct
+    layout(
+      :pMultipleTrustee, :pointer,
+      :MultipleTrusteeOperation, :int,
+      :TrusteeForm, :int,
+      :TrusteeType, :int,
+      :ptstrName, :string
+    )
+  end
+
+  class EXPLICIT_ACCESS < FFI::Struct
+    layout(
+      :grfAccessPermissions, :ulong,
+      :grfAccessMode, :int,
+      :grfInheritance, :ulong,
+      :Trustee, Trustee
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,

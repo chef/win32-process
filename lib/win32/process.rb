@@ -39,12 +39,12 @@ module Process
 
       status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
 
-      #if status == STATUS_ACCESS_DENIED
-      #  status = ZwOpenSection(handle, READ_CONTROL|WRITE_DAC, attr)
+      if status == STATUS_ACCESS_DENIED
+        status = ZwOpenSection(handle, READ_CONTROL|WRITE_DAC, attr)
       #  # DO STUFF
       #  CloseHandle(handle)
       #  status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
-      #end
+      end
 
       raise SystemCallError.new('ZwOpenSection', status) unless status >= 0
 
@@ -968,6 +968,55 @@ module Process
       end
 
       ver[:dwMajorVersion]
+    end
+
+    def make_physical_memory_writable(handle)
+      dacl  = FFI::MemoryPointer.new(:ulong)
+      ndacl = FFI::MemoryPointer.new(:ulong)
+      sec   = FFI::MemoryPointer.new(:ulong)
+
+      result = GetSecurityInfo(
+        handle,
+        SE_KERNEL_OBJECT,
+        DACL_SECURITY_INFORMATION,
+        nil,
+        nil,
+        dacl,
+        nil,
+        sec
+      )
+
+      if result != ERROR_SUCESS
+        raise SystemCallError.new('GetSecurityInfo', result)
+      end
+
+      access = EXPLICIT_ACCESS.new
+      access[:grfAccessPermissions] = SECTION_MAP_WRITE
+      access[:grfAccessMode] = GRANT_ACCESS
+      access[:grfInheritance] = NO_INHERITANCE
+      access[:Trustee][:TrusteeForm] = TRUSTEE_IS_NAME
+      access[:Trustee][:TrusteeType] = TRUSTEE_IS_USER
+      access[:Trustee][:ptstrName] = FFI::MemoryPointer.from_string('CURRENT_USER')
+
+      result = SetEntriesInAcl(1, access, dacl, ndacl)
+
+      if result != ERROR_SUCESS
+        raise SystemCallError.new('SetEntriesInAcl', result)
+      end
+
+      result = SetSecurityInfo(
+        handle,
+        SE_KERNEL_OBJECT,
+        DACL_SECURITY,
+        nil,
+        nil,
+        ndacl,
+        nil
+      )
+
+      if result != ERROR_SUCESS
+        raise SystemCallError.new('SetSecurityInfo', result)
+      end
     end
   end
 end
