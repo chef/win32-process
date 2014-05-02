@@ -1,8 +1,7 @@
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'functions')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constants')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'helper')
-
+require_relative 'process/functions'
+require_relative 'process/constants'
+require_relative 'process/structs'
+require_relative 'process/helper'
 
 module Process
   include Process::Constants
