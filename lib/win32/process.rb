@@ -19,12 +19,29 @@ module Process
   class << self
     private
 
-    def linear_to_phys(base, addr)
+    def linear_to_phys(handle, base, addr)
+      pgde = base >> 22
+      return 0 if pgde & 1 == 0
+      tmp = pgde & 0x00000080
 
+      if tmp != 0
+        addr = (pgde & 0xFFC00000) + (addr & 0x003FFFFF)
+      else
+        pgde = MapViewOfFile(handle, 4, 0, pgde & 0xFFFFF000, 0x1000)
+        pte = (pgde & 0x003FF000) >> 12
+      end
     end
 
-    def get_data(addr)
+    def get_data(handle, map, addr)
+      phys = linear_to_phys(handle, map, addr)
+      tmp = MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, phys & 0xFFFFF000, 0x1000)
 
+      if tmp == 0
+        tmp
+      else
+        UnmapViewOfFile(tmp)
+        (phys & 0xFFF) >> 2
+      end
     end
 
     public
@@ -41,16 +58,21 @@ module Process
 
       if status == STATUS_ACCESS_DENIED
         status = ZwOpenSection(handle, READ_CONTROL|WRITE_DAC, attr)
-      #  # DO STUFF
-      #  CloseHandle(handle)
-      #  status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
+        make_physical_memory_writable(handle)
+        CloseHandle(handle)
+        status = ZwOpenSection(handle, SECTION_MAP_READ|SECTION_MAP_WRITE, attr)
       end
 
       raise SystemCallError.new('ZwOpenSection', status) unless status >= 0
 
-      unless MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, 0x1000)
+      map = MapViewOfFile(handle, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, 0x1000)
+
+      unless map
         raise SystemCallError.new('MapViewOfFile', FFI.errno)
       end
+
+      thread  = get_data(handle, map, 0xFFDFF124)
+      process = get_data(handle, map, thread + 0x44)
     end
 
     # Returns whether or not the current process is part of a Job (process group).

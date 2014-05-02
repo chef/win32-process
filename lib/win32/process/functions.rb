@@ -38,6 +38,7 @@ module Process::Functions
   attach_pfunc :SetErrorMode, [:uint], :uint
   attach_pfunc :SetPriorityClass, [:handle, :dword], :bool
   attach_pfunc :TerminateProcess, [:handle, :uint], :bool
+  attach_pfunc :UnmapViewOfFile, [:uintptr_t], :bool
   attach_pfunc :WaitForSingleObject, [:handle, :dword], :dword
 
   attach_pfunc :CreateRemoteThread,
