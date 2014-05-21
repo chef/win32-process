@@ -66,9 +66,25 @@ module Process::Functions
     [:buffer_in, :buffer_in, :buffer_in, :dword, :buffer_in, :buffer_in,
      :dword, :buffer_in, :buffer_in, :pointer, :pointer], :bool
 
+  ffi_lib :ntdll
+
+  attach_pfunc :ZwCreateProcess, [:pointer, :ulong, :pointer, :handle, :bool, :handle, :handle, :handle], :int
+  attach_pfunc :ZwGetContextThread, [:handle, :pointer], :int
+=begin
+  attach_pfunc :NtCurrentProcess, [], :handle
+  attach_pfunc :NtCurrentThread, [], :handle
+  attach_pfunc :ZwQueryVirtualMemory
+  attach_pfunc :ZwQueryInformationThread
+  attach_pfunc :ZwWriteVirtualMemory
+  attach_pfunc :ZwResumeThread
+  attach_pfunc :ZwClose
+  attach_pfunc :MemoryBasicInformation
+=end
+
   ffi_lib FFI::Library::LIBC
 
   attach_pfunc :get_osfhandle, :_get_osfhandle, [:int], :intptr_t
+  attach_pfunc :setjmp, :_setjmp, [:pointer], :int
 
   begin
     attach_pfunc :get_errno, :_get_errno, [:pointer], :int

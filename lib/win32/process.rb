@@ -910,6 +910,22 @@ module Process
         exitcode
       end
     end
+
+    remove_method :fork
+
+    def fork
+      handle = FFI::MemoryPointer.new(:uintptr_t)
+      oa = OBJECT_ATTRIBUTES.new
+      oa[:Length] = OBJECT_ATTRIBUTES.size
+
+      #jenv = FFI::Buffer.new(:char, 64)
+
+      #return 0 if setjmp(jenv) != 0
+
+      #ZwCreateProcess(handle, PROCESS_ALL_ACCESS, oa, NtCurrentProcess(), true, 0, 0, 0)
+
+      #ZwGetContextThread(NtCurrentThread(), context)
+    end
   end
 
   class << self
@@ -934,4 +950,8 @@ module Process
       ver[:dwMajorVersion]
     end
   end
+end
+
+if $0 == __FILE__
+  Process.fork
 end
