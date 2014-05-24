@@ -20,6 +20,7 @@ module Process::Functions
   typedef :uintptr_t, :handle
   typedef :uintptr_t, :hwnd
   typedef :uintptr_t, :hmodule
+  typedef :long, :ntstatus
 
   ffi_lib :kernel32
 
@@ -68,16 +69,15 @@ module Process::Functions
 
   ffi_lib :ntdll
 
-  attach_pfunc :ZwCreateProcess, [:pointer, :ulong, :pointer, :handle, :bool, :handle, :handle, :handle], :int
-  attach_pfunc :ZwGetContextThread, [:handle, :pointer], :int
+  attach_pfunc :ZwCreateProcess, [:pointer, :ulong, :pointer, :handle, :bool, :handle, :handle, :handle], :ntstatus
+  attach_pfunc :ZwGetContextThread, [:handle, :pointer], :ntstatus
+  attach_pfunc :ZwClose, [:handle], :ntstatus
 =begin
-  attach_pfunc :NtCurrentProcess, [], :handle
   attach_pfunc :NtCurrentThread, [], :handle
   attach_pfunc :ZwQueryVirtualMemory
   attach_pfunc :ZwQueryInformationThread
   attach_pfunc :ZwWriteVirtualMemory
   attach_pfunc :ZwResumeThread
-  attach_pfunc :ZwClose
   attach_pfunc :MemoryBasicInformation
 =end
 
