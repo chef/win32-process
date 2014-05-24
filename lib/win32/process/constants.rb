@@ -110,4 +110,8 @@ module Process::Constants
   # GetExitCodeProcess
 
   STILL_ACTIVE = 259
+
+  # Fork
+
+  STATUS_SUCCESS = 0
 end
