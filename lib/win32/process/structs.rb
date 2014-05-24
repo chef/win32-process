@@ -121,8 +121,10 @@ module Process::Structs
     )
   end
 
+  # Size should be 16.
   class M128A < FFI::Struct
     layout(:Low, :ulong_long, :High, :long_long)
+    align 16
   end
 
   class DummyStruct < FFI::Struct
@@ -148,6 +150,7 @@ module Process::Structs
     )
   end
 
+  # Same as XSAVE_FORMAT. Size should be 512.
   class XMM_SAVE_AREA32 < FFI::Struct
     layout(
       :ControlWord, :word,
@@ -165,6 +168,7 @@ module Process::Structs
       :MxCsr_Mask, :dword,
       :FloatRegisters, [M128A, 8],
 
+      # Might use these instead for 64-bit Ruby
       #M128A XmmRegisters[16];
       #BYTE  Reserved4[96];
 
@@ -173,15 +177,17 @@ module Process::Structs
       :StackControl, [:dword, 7],
       :Cr0NpxState, :dword
     )
+    align 16
   end
 
-  class DummyUnion < FFI::Union
-    layout(
-      :FltSave, XMM_SAVE_AREA32,
-      :DummyStruct, DummyStruct
-    )
-  end
+  #class DummyUnion < FFI::Union
+  #  layout(
+  #    :FltSave, XMM_SAVE_AREA32,
+  #    :DummyStruct, DummyStruct
+  #  )
+  #end
 
+  # Size should be 716
   class CONTEXT < FFI::Struct
     layout(
       :P1Home, :dword64,
@@ -190,21 +196,25 @@ module Process::Structs
       :P4Home, :dword64,
       :P5Home, :dword64,
       :P6Home, :dword64,
+
       :ContextFlags, :dword,
       :MxCsr, :dword,
+
       :SegCs, :word,
       :SegDs, :word,
       :SegEs, :word,
       :SegFs, :word,
       :SegGs, :word,
       :SegSs, :word,
-      :EFlags, :word,
+      :EFlags, :dword,
+
       :Dr0, :dword64,
       :Dr1, :dword64,
       :Dr2, :dword64,
       :Dr3, :dword64,
       :Dr6, :dword64,
       :Dr7, :dword64,
+
       :Rax, :dword64,
       :Rcx, :dword64,
       :Rdx, :dword64,
@@ -221,19 +231,22 @@ module Process::Structs
       :R13, :dword64,
       :R14, :dword64,
       :R15, :dword64,
+
       :Rip, :dword64,
-      :Dummy, DummyUnion,
+
+      #:Dummy, DummyUnion,
+
       :VectorRegister, [M128A, 26],
       :VectorControl, :dword64,
+
       :DebugControl, :dword64,
       :LastBranchToRip, :dword64,
       :LastBranchFromRip, :dword64,
       :LastExceptionToRip, :dword64,
       :LastExceptionFromRip, :dword64
     )
+    align 16
   end
-
-  p CONTEXT.size
 
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
