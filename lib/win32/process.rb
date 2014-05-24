@@ -918,13 +918,23 @@ module Process
       oa = OBJECT_ATTRIBUTES.new
       oa[:Length] = OBJECT_ATTRIBUTES.size
 
-      #jenv = FFI::Buffer.new(:char, 64)
+      jenv = FFI::Buffer.new(:char, 64)
 
-      #return 0 if setjmp(jenv) != 0
+      if setjmp(jenv) != 0
+        raise SystemCallError.new('setjmp', FFI.errno)
+      end
 
-      #ZwCreateProcess(handle, PROCESS_ALL_ACCESS, oa, NtCurrentProcess(), true, 0, 0, 0)
+      status = ZwCreateProcess(handle, PROCESS_ALL_ACCESS, oa, GetCurrentProcess(), true, 0, 0, 0)
+
+      if status != 0
+        raise SystemCallError.new('ZwCreateProcess', status)
+      end
+
+      handle = handle.read_ulong
 
       #ZwGetContextThread(NtCurrentThread(), context)
+
+      ZwClose(handle) if handle
     end
   end
 
