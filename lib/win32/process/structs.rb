@@ -248,6 +248,18 @@ module Process::Structs
     align 16
   end
 
+  class MEMORY_BASIC_INFORMATION < FFI::Struct
+    layout(
+      :BaseAddress, :pointer,
+      :AllocationBase, :pointer,
+      :AllocationProtect, :dword,
+      :RegionSize, :size_t,
+      :State, :dword,
+      :Protect, :dword,
+      :Type, :dword
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
