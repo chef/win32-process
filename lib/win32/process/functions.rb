@@ -27,6 +27,7 @@ module Process::Functions
   attach_pfunc :CloseHandle, [:handle], :bool
   attach_pfunc :GenerateConsoleCtrlEvent, [:dword, :dword], :bool
   attach_pfunc :GetCurrentProcess, [], :handle
+  attach_pfunc :GetCurrentThread, [], :handle
   attach_pfunc :GetModuleHandle, :GetModuleHandleA, [:string], :hmodule
   attach_pfunc :GetProcessAffinityMask, [:handle, :pointer, :pointer], :bool
   attach_pfunc :GetPriorityClass, [:handle], :dword

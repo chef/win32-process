@@ -932,7 +932,27 @@ module Process
 
       handle = handle.read_ulong
 
-      #ZwGetContextThread(NtCurrentThread(), context)
+      context = CONTEXT.new
+      context[:P1Home] = CONTEXT_FULL | CONTEXT_DEBUG_REGISTERS | CONTEXT_FLOATING_POINT
+
+      status = ZwGetContextThread(GetCurrentThread(), context)
+
+      if status != 0
+        raise SystemCallError.new('ZwGetContextThread', status)
+      end
+
+      context[:Eip] =
+
+      mbi = MEMORY_BASIC_INFORMATION.new
+
+      status = ZwQueryVirtualMemory(
+        GetCurrentProcess(),
+        context[:Rsp],
+        MemoryBasicInformation,
+        mbi,
+        mbi.size,
+        0
+      )
 
       ZwClose(handle) if handle
     end
