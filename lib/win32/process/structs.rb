@@ -148,6 +148,17 @@ module Process::Structs
     )
   end
 
+  class THREAD_BASIC_INFORMATION < FFI::Struct
+    layout(
+      :ExitStatus, :long,
+      :TebBaseAddress, :pointer,
+      :Client_ID, CLIENT_ID,
+      :AffinityMask, :uintptr_t,
+      :Priority, :uintptr_t,
+      :BasePriority, :uintptr_t
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
