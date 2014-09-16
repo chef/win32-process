@@ -131,6 +131,16 @@ module Process::Structs
     )
   end
 
+  class USER_STACK < FFI::Struct
+    layout(
+      :FixedStackBase, :pointer,
+      :FixedStackLimit, :pointer,
+      :ExpandableStackBase, :pointer,
+      :ExpandableStackLimit, :pointer,
+      :ExpandableStackBottom, :pointer
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
