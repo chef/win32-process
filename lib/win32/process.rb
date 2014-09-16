@@ -3,7 +3,6 @@ require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constant
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
 require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'helper')
 
-
 module Process
   include Process::Constants
   extend Process::Functions
@@ -17,6 +16,52 @@ module Process
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
 
   class << self
+    remove_method :fork
+
+    private
+
+    def child_entry
+      longjmp(jenv, 1)
+      return 0
+    end
+
+    public
+
+    def fork
+      oa    = OBJECT_ATTRIBUTES.new
+      mbi   = MEMORY_BASIC_INFORMATION.new
+      cid   = CLIENT_ID.new
+      tbi   = THREAD_BASIC_INFORMATION.new
+      stack = USER_STACK.new
+      #context = CONTEXT.new
+      #tib = NT_TIB.new
+
+      oa[:Length] = oa.size
+
+      return if setjmp(jenv) != 0 # Return as child
+
+      #CreateProcess()
+      #GetContextThread()
+      #context[:Rip] = child_entry # Assume 64bit Windows
+      #QueryVirtualMemory()
+
+      stack[:FixedStackBase] = 0
+      stack[:FixedStackLimit] = 0
+      stack[:ExpandableStackBase] = mbi[:BaseAddress] + mbi[:RegionSize]
+      stack[:ExpandableStackLimit] = mbi[:BaseAddress]
+      stack[:ExpandableStackBottom] = mbi[:AllocationBase]
+
+      #CreateThread()
+      #QueryInformationThread()
+      #tib = tbi[:TebBaseAddress]
+      #QueryInformationThread()
+      #WriteVirtualMemory()
+      #ResumeThread()
+      #Close(hthread)
+      #Close(hprocess)
+      #return cid[:UniqueProcess]
+    end
+
     # Returns whether or not the current process is part of a Job (process group).
     def job?
       pbool = FFI::MemoryPointer.new(:int)
