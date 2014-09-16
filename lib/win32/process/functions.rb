@@ -69,6 +69,8 @@ module Process::Functions
   ffi_lib FFI::Library::LIBC
 
   attach_pfunc :get_osfhandle, :_get_osfhandle, [:int], :intptr_t
+  attach_pfunc :setjmp, :_setjmp, [:pointer], :int
+  attach_pfunc :longjmp, [:pointer, :int], :void
 
   begin
     attach_pfunc :get_errno, :_get_errno, [:pointer], :int
