@@ -141,6 +141,13 @@ module Process::Structs
     )
   end
 
+  class CLIENT_ID < FFI::Struct
+    layout(
+      :UniqueProcess, :handle,
+      :UniqueThread, :handle
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
