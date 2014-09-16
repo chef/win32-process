@@ -159,6 +159,29 @@ module Process::Structs
     )
   end
 
+  class EXCEPTION_REGISTRATION_RECORD < FFI::Struct
+    layout(
+      :Next, :pointer,
+      :Handler, :int
+    )
+  end
+
+  class TIB_UNION < FFI::Union
+    layout(:FiberData, :pointer, :Version, :ulong)
+  end
+
+  class NT_TIB < FFI::Struct
+    layout(
+      :ExceptionList, EXCEPTION_REGISTRATION_RECORD,
+      :StackBase, :pointer,
+      :StackLiit, :pointer,
+      :SubSystemTib, :pointer,
+      :Union, TIB_UNION,
+      :ArbitraryUserPointer, :pointer,
+      :Self, :pointer
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
