@@ -20,6 +20,7 @@ module Process::Functions
   typedef :uintptr_t, :handle
   typedef :uintptr_t, :hwnd
   typedef :uintptr_t, :hmodule
+  typedef :long, :ntstatus
 
   ffi_lib :kernel32
 
@@ -77,4 +78,15 @@ module Process::Functions
   rescue FFI::NotFoundError
     # Do nothing, Windows XP or earlier.
   end
+
+  ffi_lib :ntdll
+
+  attach_pfunc :ZwClose, [:handle], :ntstatus
+  attach_pfunc :ZwCreateProcess, [:pointer, :ulong, :pointer, :handle, :bool, :handle, :handle, :handle], :ntstatus
+  attach_pfunc :ZwCreateThread, [:pointer, :ulong, :pointer, :handle, :pointer, :pointer, :pointer, :bool], :ntstatus
+  attach_pfunc :ZwGetContextThread, [:handle, :pointer], :ntstatus
+  attach_pfunc :ZwQueryVirtualMemory, [:handle, :uint64, :int, :pointer, :ulong, :pointer], :ntstatus
+  attach_pfunc :ZwQueryInformationThread, [:handle, :int, :pointer, :ulong, :pointer], :ntstatus
+  attach_pfunc :ZwResumeThread, [:handle, :pointer], :ntstatus
+  attach_pfunc :ZwWriteVirtualMemory, [:handle, :uint64, :pointer, :ulong, :pointer], :ntstatus
 end
