@@ -1,8 +1,7 @@
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'functions')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'constants')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'structs')
-require File.join(File.expand_path(File.dirname(__FILE__)), 'process', 'helper')
-
+require_relative 'process/functions'
+require_relative 'process/constants'
+require_relative 'process/structs'
+require_relative 'process/helper'
 
 module Process
   include Process::Constants
@@ -11,7 +10,7 @@ module Process
   extend Process::Constants
 
   # The version of the win32-process library.
-  WIN32_PROCESS_VERSION = '0.7.4'
+  WIN32_PROCESS_VERSION = '0.7.5'
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
