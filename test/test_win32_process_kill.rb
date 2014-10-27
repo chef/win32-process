@@ -74,6 +74,12 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
     assert_raise(Errno::EINVAL){ Process.kill(9, 0) }
   end
 
+  test "kill accepts BRK or SIGBRK as a signal name" do
+    pid = Process.spawn(@cmd)
+    assert_nothing_raised{ Process.kill(:BRK, pid) }
+    assert_nothing_raised{ Process.kill(:SIGBRK, pid) }
+  end
+
   # We break from the spec here.
   #test "an EINVAL error is raised if the pid is the current process and it's not a 0 or SIGKILL" do
   #  assert_raise(Errno::EINVAL){ Process.kill(1, Process.pid) }
