@@ -756,10 +756,12 @@ module Process
         raise ArgumentError, "bad signal type #{signal.class}"
       end
 
-      # Match the spec, making an exception for BRK/SIGBRK, if the signal name is invalid
+      # Match the spec, making an exception for BRK/SIGBRK, if the signal name is invalid.
+      # Older versions of JRuby did not include KILL, so we've made an explicit exception
+      # for that here, too.
       if signal.is_a?(String) || signal.is_a?(Symbol)
         signal = signal.to_s.sub('SIG', '')
-        unless Signal.list.keys.include?(signal) || ['BRK', 'BRK'].include?(signal)
+        unless Signal.list.keys.include?(signal) || ['KILL', 'BRK'].include?(signal)
           raise ArgumentError, "unsupported name '#{signal}'"
         end
       end
