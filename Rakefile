@@ -10,7 +10,7 @@ namespace :gem do
   desc 'Create the win32-process gem'
   task :create => [:clean] do
     spec = eval(IO.read('win32-process.gemspec'))
-    if Gem::VERSION.to_f < 2.0
+    if Gem::VERSION < "2.0"
       Gem::Builder.new(spec).build
     else
       require 'rubygems/package'
@@ -21,7 +21,7 @@ namespace :gem do
   desc 'Install the win32-process gem'
   task :install => [:create] do
     file = Dir["*.gem"].first
-    sh "gem install #{file}"
+    sh "gem install -l #{file}"
   end
 end
 
