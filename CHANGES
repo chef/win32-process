@@ -1,3 +1,8 @@
+= 0.7.5 - ???
+* Use require_relative where possible.
+* Minor updates to gemspec and Rakefile.
+* Added known issue for JRuby and SIGBRK to the README.
+
 = 0.7.4 - 21-Oct-2013
 * Fixed the INVALID_HANDLE_VALUE constant for 64-bit versions of Ruby.
 * Added Rake as a development dependency.
