@@ -55,8 +55,10 @@
    This was added at some point in the Ruby 1.9 dev cycle so it was removed
    from this library.
 
-= Known Bugs	
-  None known. Any bugs should be reported on the project page at
+= Known Issues
+  JRuby doesn't seem to like SIGBRK for Process.kill.
+
+  Any issues or bugs should be reported on the project page at
   https://github.com/djberg96/win32-process.
 	
 = License
