@@ -347,8 +347,8 @@ module Process
         handle = OpenJobObjectA(JOB_OBJECT_SET_ATTRIBUTES, true, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
       else
-        @job_name = 'ruby_' + Process.pid.to_s
-        handle = CreateJobObjectA(nil, job_name)
+        @win32_process_job_name = 'ruby_' + Process.pid.to_s
+        handle = CreateJobObjectA(nil, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "CreateJobObject" if handle == 0
       end
 
