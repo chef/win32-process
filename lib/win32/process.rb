@@ -332,6 +332,9 @@ module Process
     #   Process.setrlimit(Process::RLIMIT_VMEM, 1024 * 4) # => nil
     #   Process.getrlimit(Process::RLIMIT_VMEM) # => [4096, 4096]
     #
+    # WARNING: Exceeding the limit you set with this method could segfault
+    # the interpreter. Consider this method experimental.
+    #
     def setrlimit(resource, current_limit, max_limit = nil)
       max_limit = current_limit
 
