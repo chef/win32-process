@@ -1,6 +1,7 @@
-= 0.7.5 - ???
+= 0.7.5 - 3-Mar-2015
 * Use require_relative where possible.
-* Fixed a bug in Process.setrlimit.
+* Fixed a bug in Process.setrlimit. Note that this method has been marked
+  as experimental until further notice.
 * Minor updates to gemspec and Rakefile.
 * Added known issue for JRuby and SIGBRK to the README.
 
