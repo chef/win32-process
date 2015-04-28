@@ -110,4 +110,9 @@ module Process::Constants
   # GetExitCodeProcess
 
   STILL_ACTIVE = 259
+
+  # Snapshot constants
+
+  TH32CS_SNAPTHREAD   = 0x00000004
+  ERROR_NO_MORE_FILES = 0x00000018
 end

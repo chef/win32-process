@@ -24,6 +24,7 @@ module Process::Functions
   ffi_lib :kernel32
 
   attach_pfunc :CloseHandle, [:handle], :bool
+  attach_pfunc :CreateToolhelp32Snapshot, [:dword, :dword], :handle
   attach_pfunc :GenerateConsoleCtrlEvent, [:dword, :dword], :bool
   attach_pfunc :GetCurrentProcess, [], :handle
   attach_pfunc :GetModuleHandle, :GetModuleHandleA, [:string], :hmodule
@@ -37,6 +38,8 @@ module Process::Functions
   attach_pfunc :SetErrorMode, [:uint], :uint
   attach_pfunc :SetPriorityClass, [:handle, :dword], :bool
   attach_pfunc :TerminateProcess, [:handle, :uint], :bool
+  attach_pfunc :Thread32First, [:handle, :pointer], :bool
+  attach_pfunc :Thread32Next, [:handle, :pointer], :bool
   attach_pfunc :WaitForSingleObject, [:handle, :dword], :dword
 
   attach_pfunc :CreateRemoteThread,

@@ -914,6 +914,47 @@ module Process
         exitcode
       end
     end
+
+    def snapshot(info_type = 'thread')
+      case info_type.downcase
+        when 'thread', TH32CS_SNAPTHREAD
+          flag = TH32CS_SNAPTHREAD
+        else
+          raise ArgumentError, "info_type '#{info_type}' unsupported"
+      end
+
+      begin
+        handle = CreateToolhelp32Snapshot(flag, 0)
+
+        if handle == INVALID_HANDLE_VALUE
+          raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
+        end
+
+        lpte = THREADENTRY32.new
+        lpte[:dwSize] = lpte.size
+
+        # Note that we don't include the first entry in the final output
+        # because it will always be process 0, thread 0.
+        unless Thread32First(handle, lpte)
+          if FFI.errno == ERROR_NO_MORE_FILES
+            return array
+          else
+            raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
+          end
+        end
+
+        array = []
+
+        while Thread32Next(handle, lpte)
+          next if lpte[:th32OwnerProcessID] != Process.pid
+          array << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+        end
+
+        array
+      ensure
+        CloseHandle(handle) if handle
+      end
+    end
   end
 
   class << self

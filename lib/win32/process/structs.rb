@@ -108,11 +108,30 @@ module Process::Structs
     )
   end
 
+  class THREADENTRY32 < FFI::Struct
+    layout(
+      :dwSize, :dword,
+      :cntUsage, :dword,
+      :th32ThreadID, :dword,
+      :th32OwnerProcessID, :dword,
+      :tpBasePri, :long,
+      :tpDeltaPri, :long,
+      :dwFlags, :dword
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
     :thread_handle,
     :process_id,
     :thread_id
+  )
+
+  # Used by Process.snapshot
+  ThreadInfo = Struct.new("ThreadInfo",
+    :thread_id,
+    :process_id,
+    :base_priority
   )
 end
