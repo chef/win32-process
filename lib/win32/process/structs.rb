@@ -120,6 +120,29 @@ module Process::Structs
     )
   end
 
+  class HEAPLIST32 < FFI::Struct
+    layout(
+      :dwSize, :size_t,
+      :th32ProcessID, :dword,
+      :th32HeapID, :uintptr_t,
+      :dwFlags, :dword
+    )
+  end
+
+  class HEAPENTRY32 < FFI::Struct
+    layout(
+      :dwSize, :size_t,
+      :hHandle, :handle,
+      :dwAddress, :uintptr_t,
+      :dwBlockSize, :size_t,
+      :dwFlags, :dword,
+      :dwLockCount, :dword,
+      :dwResvd, :dword,
+      :th32ProcessID, :dword,
+      :th32HeapID, :uintptr_t
+    )
+  end
+
   # Used by Process.create
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
@@ -129,9 +152,18 @@ module Process::Structs
   )
 
   # Used by Process.snapshot
+
   ThreadInfo = Struct.new("ThreadInfo",
     :thread_id,
     :process_id,
     :base_priority
+  )
+
+  HeapInfo = Struct.new("HeapInfo",
+    :address,
+    :block_size,
+    :flags,
+    :process_id,
+    :heap_id
   )
 end

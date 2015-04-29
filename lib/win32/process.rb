@@ -915,10 +915,30 @@ module Process
       end
     end
 
+    # Returns a list of process information structs in the form of a hash,
+    # with the pid as the key, and an array of information as the value of that
+    # key. The type of information in that array depends on the +info_type+
+    # parameter. The possible values for +info_type+, and the type of information
+    # they each return is as follows:
+    #
+    #   :thread => ThreadInfo[:thread_id, :process_id, :base_priority]
+    #   :heap   => HeapInfo[:address, :block_size, :flags, :process_id, :heap_id]
+    #
+    # Note that it is up to you to filter by pid.
+    #
+    # Example:
+    #
+    #   Process.snapshot.each{ |pid, v|
+    #     puts "PID: #{pid}"
+    #     p v
+    #   }
+    #
     def snapshot(info_type = 'thread')
-      case info_type.downcase
+      case info_type.to_s.downcase
         when 'thread', TH32CS_SNAPTHREAD
           flag = TH32CS_SNAPTHREAD
+        when 'heap', TH32CS_SNAPHEAPLIST
+          flag = TH32CS_SNAPHEAPLIST
         else
           raise ArgumentError, "info_type '#{info_type}' unsupported"
       end
@@ -930,24 +950,11 @@ module Process
           raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
         end
 
-        lpte = THREADENTRY32.new
-        lpte[:dwSize] = lpte.size
-
-        # Note that we don't include the first entry in the final output
-        # because it will always be process 0, thread 0.
-        unless Thread32First(handle, lpte)
-          if FFI.errno == ERROR_NO_MORE_FILES
-            return array
-          else
-            raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
-          end
-        end
-
-        array = []
-
-        while Thread32Next(handle, lpte)
-          next if lpte[:th32OwnerProcessID] != Process.pid
-          array << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+        case info_type.to_s.downcase
+          when 'thread', TH32CS_SNAPTHREAD
+            array = get_thread_info(handle)
+          when 'heap', TH32CS_SNAPHEAPLIST
+            array = get_heap_info(handle)
         end
 
         array
@@ -967,6 +974,61 @@ module Process
       bool ? buf.read_string : nil
     end
 
+    # Return thread info for Process.snapshot
+    def get_thread_info(handle, pid = nil)
+      lpte = THREADENTRY32.new
+      lpte[:dwSize] = lpte.size
+
+      hash = Hash.new{ |h,k| h[k] = [] }
+
+      if Thread32First(handle, lpte)
+        hash[lpte[:th32OwnerProcessID]] << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+      else
+        if FFI.errno == ERROR_NO_MORE_FILES
+          return hash
+        else
+          raise SystemCallError.new('Thread32First', FFI.errno)
+        end
+      end
+
+      while Thread32Next(handle, lpte)
+        hash[lpte[:th32OwnerProcessID]] << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+      end
+
+      hash
+    end
+
+    # Return heap info for Process.snapshot
+    def get_heap_info(handle)
+      hash = Hash.new{ |h,k| h[k] = [] }
+
+      hl = HEAPLIST32.new
+      hl[:dwSize] = hl.size
+
+      if Heap32ListFirst(handle, hl)
+        while Heap32ListNext(handle, hl)
+          he = HEAPENTRY32.new
+          he[:dwSize] = he.size
+
+          if Heap32First(he, Process.pid, hl[:th32HeapID])
+            hash[he[:th32ProcessID]] << HeapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
+          else
+            if FFI.errno == ERROR_NO_MORE_FILES
+              break
+            else
+              raise SystemCallError.new('Heap32First', FFI.errno)
+            end
+          end
+
+          while Heap32Next(he)
+            hash[he[:th32ProcessID]] << HeapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
+          end
+        end
+      end
+
+      hash
+    end
+
     # Private method that returns the Windows major version number.
     def windows_version
       ver = OSVERSIONINFO.new
@@ -979,4 +1041,11 @@ module Process
       ver[:dwMajorVersion]
     end
   end
+end
+
+if $0 == __FILE__
+  Process.snapshot(:heap).each{ |pid, v|
+    puts "PID: #{pid}"
+    p v
+  }
 end

@@ -113,6 +113,7 @@ module Process::Constants
 
   # Snapshot constants
 
+  TH32CS_SNAPHEAPLIST = 0x00000001
   TH32CS_SNAPTHREAD   = 0x00000004
   ERROR_NO_MORE_FILES = 0x00000018
 end
