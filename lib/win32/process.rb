@@ -916,17 +916,18 @@ module Process
     end
 
     # Returns a list of process information structs in the form of a hash,
-    # with the pid as the key, and an array of information as the value of that
-    # key. The type of information in that array depends on the +info_type+
-    # parameter. The possible values for +info_type+, and the type of information
-    # they each return is as follows:
+    # with the pid as the key, and an array of information as the value of
+    # that key. The type of information in that array depends on the
+    # +info_type+ parameter. The possible values for +info_type+, and the
+    # type of information they each return is as follows:
     #
     #   :thread  => ThreadSnapInfo[:thread_id, :process_id, :base_priority]
     #   :heap    => HeapSnapInfo[:address, :block_size, :flags, :process_id, :heap_id]
     #   :module  => ModuleSnapInfo[:process_id, :address, :module_size, :handle, :name, :path]
     #   :process => ProcessSnapInfo[:process_id, :threads, :parent_process_id, :priority, :flags, :path]
     #
-    # Note that it is up to you to filter by pid if you wish.
+    # If no argument is provided, then :thread is assumed. Note that it is up
+    # to you to filter by pid if you wish.
     #
     # Example:
     #
