@@ -25,7 +25,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "win32-process version is set to the correct value" do
-    assert_equal('0.7.5', Process::WIN32_PROCESS_VERSION)
+    assert_equal('0.8.0', Process::WIN32_PROCESS_VERSION)
   end
 
   test "create basic functionality" do
@@ -296,6 +296,22 @@ class TC_Win32Process < Test::Unit::TestCase
 
   test "volume_type is a private method" do
     assert_not_respond_to(Process, :volume_type)
+  end
+
+  test "snapshot method basic functionality" do
+    assert_respond_to(Process, :snapshot)
+    assert_nothing_raised{ Process.snapshot }
+    assert_kind_of(Hash, Process.snapshot)
+  end
+
+  test "snapshot accepts :thread, :module or :heap arguments" do
+    assert_nothing_raised{ Process.snapshot(:thread) }
+    assert_nothing_raised{ Process.snapshot(:module) }
+    assert_nothing_raised{ Process.snapshot(:heap) }
+  end
+
+  test "snapshot raises an error if an invalid argument is passed" do
+    assert_raise(ArgumentError){ Process.snapshot(:bogus) }
   end
 
   test "ffi functions are private" do
