@@ -158,8 +158,6 @@ module Process::Structs
     )
   end
 
-  p MODULEENTRY32.size
-
   # Used by Process.create
 
   ProcessInfo = Struct.new("ProcessInfo",
