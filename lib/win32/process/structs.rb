@@ -158,6 +158,21 @@ module Process::Structs
     )
   end
 
+  class PROCESSENTRY32 < FFI::Struct
+    layout(
+      :dwSize, :dword,
+      :cntUsage, :dword,
+      :th32ProcessID, :dword,
+      :th32DefaultHeapID, :uintptr_t,
+      :th32ModuleID, :dword,
+      :cntThreads, :dword,
+      :th32ParentProcessID, :dword,
+      :pcPriClassBase, :long,
+      :dwFlags, :dword,
+      :szExeFile, [:char, 260]
+    )
+  end
+
   # Used by Process.create
 
   ProcessInfo = Struct.new("ProcessInfo",
@@ -169,13 +184,13 @@ module Process::Structs
 
   # Used by Process.snapshot
 
-  ThreadInfo = Struct.new("ThreadInfo",
+  ThreadSnapInfo = Struct.new("ThreadSnapInfo",
     :thread_id,
     :process_id,
     :base_priority
   )
 
-  HeapInfo = Struct.new("HeapInfo",
+  HeapSnapInfo = Struct.new("HeapSnapInfo",
     :address,
     :block_size,
     :flags,
@@ -183,12 +198,21 @@ module Process::Structs
     :heap_id
   )
 
-  ModuleInfo = Struct.new("ModuleInfo",
+  ModuleSnapInfo = Struct.new("ModuleSnapInfo",
     :process_id,
     :address,
     :module_size,
     :handle,
     :name,
+    :path
+  )
+
+  ProcessSnapInfo = Struct.new("ProcessSnapInfo",
+    :process_id,
+    :threads,
+    :parent_process_id,
+    :priority,
+    :flags,
     :path
   )
 end

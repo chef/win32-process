@@ -921,9 +921,10 @@ module Process
     # parameter. The possible values for +info_type+, and the type of information
     # they each return is as follows:
     #
-    #   :thread => ThreadInfo[:thread_id, :process_id, :base_priority]
-    #   :heap   => HeapInfo[:address, :block_size, :flags, :process_id, :heap_id]
-    #   :module => ModuleInfo[:process_id, :address, :module_size, :handle, :name, :path]
+    #   :thread  => ThreadSnapInfo[:thread_id, :process_id, :base_priority]
+    #   :heap    => HeapSnapInfo[:address, :block_size, :flags, :process_id, :heap_id]
+    #   :module  => ModuleSnapInfo[:process_id, :address, :module_size, :handle, :name, :path]
+    #   :process => ProcessSnapInfo[:process_id, :threads, :parent_process_id, :priority, :flags, :path]
     #
     # Note that it is up to you to filter by pid if you wish.
     #
@@ -941,6 +942,9 @@ module Process
     #   # Get heap info for just the current process
     #   p Process.snapshot(:heap)[Process.pid]
     #
+    #   # Show pids of all running processes
+    #   p Process.snapshot(:process).keys
+    #
     def snapshot(info_type = 'thread')
       case info_type.to_s.downcase
         when 'thread'
@@ -949,6 +953,8 @@ module Process
           flag = TH32CS_SNAPHEAPLIST
         when 'module'
           flag = TH32CS_SNAPMODULE
+        when 'process'
+          flag = TH32CS_SNAPPROCESS
         else
           raise ArgumentError, "info_type '#{info_type}' unsupported"
       end
@@ -967,6 +973,8 @@ module Process
             array = get_heap_info(handle)
           when 'module'
             array = get_module_info(handle)
+          when 'process'
+            array = get_process_info(handle)
         end
 
         array
@@ -994,7 +1002,7 @@ module Process
       hash = Hash.new{ |h,k| h[k] = [] }
 
       if Thread32First(handle, lpte)
-        hash[lpte[:th32OwnerProcessID]] << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+        hash[lpte[:th32OwnerProcessID]] << ThreadSnapInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
       else
         if FFI.errno == ERROR_NO_MORE_FILES
           return hash
@@ -1004,7 +1012,7 @@ module Process
       end
 
       while Thread32Next(handle, lpte)
-        hash[lpte[:th32OwnerProcessID]] << ThreadInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
+        hash[lpte[:th32OwnerProcessID]] << ThreadSnapInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
       end
 
       hash
@@ -1023,7 +1031,7 @@ module Process
           he[:dwSize] = he.size
 
           if Heap32First(he, Process.pid, hl[:th32HeapID])
-            hash[he[:th32ProcessID]] << HeapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
+            hash[he[:th32ProcessID]] << HeapSnapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
           else
             if FFI.errno == ERROR_NO_MORE_FILES
               break
@@ -1033,7 +1041,7 @@ module Process
           end
 
           while Heap32Next(he)
-            hash[he[:th32ProcessID]] << HeapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
+            hash[he[:th32ProcessID]] << HeapSnapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
           end
         end
       end
@@ -1041,7 +1049,7 @@ module Process
       hash
     end
 
-    # Return process info for Process.snapshot
+    # Return module info for Process.snapshot
     def get_module_info(handle)
       hash = Hash.new{ |h,k| h[k] = [] }
 
@@ -1049,7 +1057,7 @@ module Process
       me[:dwSize] = me.size
 
       if Module32First(handle, me)
-        hash[me[:th32ProcessID]] << ModuleInfo.new(
+        hash[me[:th32ProcessID]] << ModuleSnapInfo.new(
           me[:th32ProcessID],
           me[:modBaseAddr].to_i,
           me[:modBaseSize],
@@ -1066,7 +1074,7 @@ module Process
       end
 
       while Module32Next(handle, me)
-        hash[me[:th32ProcessID]] << ModuleInfo.new(
+        hash[me[:th32ProcessID]] << ModuleSnapInfo.new(
           me[:th32ProcessID],
           me[:modBaseAddr].to_i,
           me[:modBaseSize],
@@ -1077,6 +1085,44 @@ module Process
       end
 
       hash
+    end
+
+    # Return process info for Process.snapshot
+    def get_process_info(handle)
+      hash = Hash.new{ |h,k| h[k] = [] }
+
+      pe = PROCESSENTRY32.new
+      pe[:dwSize] = pe.size
+
+      if Process32First(handle, pe)
+        hash[pe[:th32ProcessID]] = ProcessSnapInfo.new(
+          pe[:th32ProcessID],
+          pe[:cntThreads],
+          pe[:th32ParentProcessID],
+          pe[:pcPriClassBase],
+          pe[:dwFlags],
+          pe[:szExeFile].to_s
+        )
+      else
+        if FFI.errno == ERROR_NO_MORE_FILES
+          return hash
+        else
+          raise SystemCallError.new('Process32First', FFI.errno)
+        end
+      end
+
+      while Process32Next(handle, pe)
+        hash[pe[:th32ProcessID]] = ProcessSnapInfo.new(
+          pe[:th32ProcessID],
+          pe[:cntThreads],
+          pe[:th32ParentProcessID],
+          pe[:pcPriClassBase],
+          pe[:dwFlags],
+          pe[:szExeFile].to_s
+        )
+      end
+
+      hash      
     end
 
     # Private method that returns the Windows major version number.

@@ -40,6 +40,8 @@ module Process::Functions
   attach_pfunc :Module32Next, [:handle, :pointer], :bool
   attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
   attach_pfunc :OpenProcess, [:dword, :bool, :dword], :handle
+  attach_pfunc :Process32First, [:handle, :pointer], :bool
+  attach_pfunc :Process32Next, [:handle, :pointer], :bool
   attach_pfunc :SetHandleInformation, [:handle, :dword, :dword], :bool
   attach_pfunc :SetErrorMode, [:uint], :uint
   attach_pfunc :SetPriorityClass, [:handle, :dword], :bool
