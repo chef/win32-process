@@ -308,6 +308,7 @@ class TC_Win32Process < Test::Unit::TestCase
     assert_nothing_raised{ Process.snapshot(:thread) }
     assert_nothing_raised{ Process.snapshot(:module) }
     assert_nothing_raised{ Process.snapshot(:heap) }
+    assert_nothing_raised{ Process.snapshot(:process) }
   end
 
   test "snapshot raises an error if an invalid argument is passed" do
