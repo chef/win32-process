@@ -1,3 +1,7 @@
+= 0.8.0 - 29-Apr-2015
+* Added the Process.snapshot method that lets you gather information for
+  the heap, threads, modules, and processes.
+
 = 0.7.5 - 3-Mar-2015
 * Use require_relative where possible.
 * Fixed a bug in Process.setrlimit. Note that this method has been marked
