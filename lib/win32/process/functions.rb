@@ -36,6 +36,8 @@ module Process::Functions
   attach_pfunc :Heap32ListNext, [:handle, :pointer], :bool
   attach_pfunc :Heap32First, [:pointer, :dword, :uintptr_t], :bool
   attach_pfunc :Heap32Next, [:pointer], :bool
+  attach_pfunc :Module32First, [:handle, :pointer], :bool
+  attach_pfunc :Module32Next, [:handle, :pointer], :bool
   attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
   attach_pfunc :OpenProcess, [:dword, :bool, :dword], :handle
   attach_pfunc :SetHandleInformation, [:handle, :dword, :dword], :bool

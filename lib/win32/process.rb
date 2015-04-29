@@ -935,26 +935,30 @@ module Process
     #
     def snapshot(info_type = 'thread')
       case info_type.to_s.downcase
-        when 'thread', TH32CS_SNAPTHREAD
+        when 'thread'
           flag = TH32CS_SNAPTHREAD
-        when 'heap', TH32CS_SNAPHEAPLIST
+        when 'heap'
           flag = TH32CS_SNAPHEAPLIST
+        when 'module'
+          flag = TH32CS_SNAPMODULE
         else
           raise ArgumentError, "info_type '#{info_type}' unsupported"
       end
 
       begin
-        handle = CreateToolhelp32Snapshot(flag, 0)
+        handle = CreateToolhelp32Snapshot(flag, Process.pid)
 
         if handle == INVALID_HANDLE_VALUE
           raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
         end
 
         case info_type.to_s.downcase
-          when 'thread', TH32CS_SNAPTHREAD
+          when 'thread'
             array = get_thread_info(handle)
-          when 'heap', TH32CS_SNAPHEAPLIST
+          when 'heap'
             array = get_heap_info(handle)
+          when 'module'
+            array = get_module_info(handle)
         end
 
         array
@@ -1029,6 +1033,44 @@ module Process
       hash
     end
 
+    # Return process info for Process.snapshot
+    def get_module_info(handle)
+      hash = Hash.new{ |h,k| h[k] = [] }
+
+      me = MODULEENTRY32.new
+      me[:dwSize] = me.size
+
+      if Module32First(handle, me)
+        hash[me[:th32ProcessID]] << ModuleInfo.new(
+          me[:th32ProcessID],
+          me[:modBaseAddr],
+          me[:modBaseSize],
+          me[:hModule],
+          me[:szModule].to_s,
+          me[:szExePath].to_s
+        )
+      else
+        if FFI.errno == ERROR_NO_MORE_FILES
+          return hash
+        else
+          raise SystemCallError.new('Module32First', FFI.errno)
+        end
+      end
+
+      while Module32Next(handle, me)
+        hash[me[:th32ProcessID]] << ModuleInfo.new(
+          me[:th32ProcessID],
+          me[:modBaseAddr],
+          me[:modBaseSize],
+          me[:hModule],
+          me[:szModule].to_s,
+          me[:szExePath].to_s
+        )
+      end
+
+      hash
+    end
+
     # Private method that returns the Windows major version number.
     def windows_version
       ver = OSVERSIONINFO.new
@@ -1044,7 +1086,7 @@ module Process
 end
 
 if $0 == __FILE__
-  Process.snapshot(:heap).each{ |pid, v|
+  Process.snapshot(:module).each{ |pid, v|
     puts "PID: #{pid}"
     p v
   }

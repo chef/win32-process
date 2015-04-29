@@ -143,7 +143,23 @@ module Process::Structs
     )
   end
 
+  class MODULEENTRY32 < FFI::Struct
+    layout(
+      :dwSize, :dword,
+      :th32ModuleID, :dword,
+      :th32ProcessID, :dword,
+      :GlblcntUsage, :dword,
+      :ProccntUsage, :dword,
+      :modBaseAddr, :uchar,
+      :modBaseSize, :dword,
+      :hModule, :handle,
+      :szModule, [:char, 256],
+      :szExePath, [:char, 256]
+    )
+  end
+
   # Used by Process.create
+
   ProcessInfo = Struct.new("ProcessInfo",
     :process_handle,
     :thread_handle,
@@ -165,5 +181,14 @@ module Process::Structs
     :flags,
     :process_id,
     :heap_id
+  )
+
+  ModuleInfo = Struct.new("ModuleInfo",
+    :process_id,
+    :address,
+    :module_size,
+    :handle,
+    :name,
+    :path
   )
 end
