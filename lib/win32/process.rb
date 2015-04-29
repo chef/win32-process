@@ -923,15 +923,23 @@ module Process
     #
     #   :thread => ThreadInfo[:thread_id, :process_id, :base_priority]
     #   :heap   => HeapInfo[:address, :block_size, :flags, :process_id, :heap_id]
+    #   :module => ModuleInfo[:process_id, :address, :module_size, :handle, :name, :path]
     #
-    # Note that it is up to you to filter by pid.
+    # Note that it is up to you to filter by pid if you wish.
     #
     # Example:
     #
+    #   # Get all thread info
     #   Process.snapshot.each{ |pid, v|
     #     puts "PID: #{pid}"
     #     p v
     #   }
+    #
+    #   # Get module info for just the current process
+    #   p Process.snapshot(:module)[Process.pid]
+    #
+    #   # Get heap info for just the current process
+    #   p Process.snapshot(:heap)[Process.pid]
     #
     def snapshot(info_type = 'thread')
       case info_type.to_s.downcase
@@ -1043,7 +1051,7 @@ module Process
       if Module32First(handle, me)
         hash[me[:th32ProcessID]] << ModuleInfo.new(
           me[:th32ProcessID],
-          me[:modBaseAddr],
+          me[:modBaseAddr].to_i,
           me[:modBaseSize],
           me[:hModule],
           me[:szModule].to_s,
@@ -1060,7 +1068,7 @@ module Process
       while Module32Next(handle, me)
         hash[me[:th32ProcessID]] << ModuleInfo.new(
           me[:th32ProcessID],
-          me[:modBaseAddr],
+          me[:modBaseAddr].to_i,
           me[:modBaseSize],
           me[:hModule],
           me[:szModule].to_s,
@@ -1083,11 +1091,4 @@ module Process
       ver[:dwMajorVersion]
     end
   end
-end
-
-if $0 == __FILE__
-  Process.snapshot(:module).each{ |pid, v|
-    puts "PID: #{pid}"
-    p v
-  }
 end

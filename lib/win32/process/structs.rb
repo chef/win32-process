@@ -150,13 +150,15 @@ module Process::Structs
       :th32ProcessID, :dword,
       :GlblcntUsage, :dword,
       :ProccntUsage, :dword,
-      :modBaseAddr, :uchar,
+      :modBaseAddr, :pointer,
       :modBaseSize, :dword,
       :hModule, :handle,
       :szModule, [:char, 256],
-      :szExePath, [:char, 256]
+      :szExePath, [:char, 260]
     )
   end
+
+  p MODULEENTRY32.size
 
   # Used by Process.create
 
