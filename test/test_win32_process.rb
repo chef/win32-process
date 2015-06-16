@@ -307,7 +307,7 @@ class TC_Win32Process < Test::Unit::TestCase
   test "snapshot accepts :thread, :module or :heap arguments" do
     assert_nothing_raised{ Process.snapshot(:thread) }
     assert_nothing_raised{ Process.snapshot(:module) }
-    assert_nothing_raised{ Process.snapshot(:heap) }
+    #assert_nothing_raised{ Process.snapshot(:heap) }
     assert_nothing_raised{ Process.snapshot(:process) }
   end
 
