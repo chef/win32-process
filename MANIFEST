@@ -3,8 +3,10 @@
 * MANIFEST
 * Rakefile
 * win32-process.gemspec
+* certs/djberg96_pub.pem
 * examples/example_create.rb
 * examples/example_kill.rb
+* lib/win32-process.rb
 * lib/win32/process.rb
 * lib/win32/process/constants.rb
 * lib/win32/process/functions.rb
