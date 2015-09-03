@@ -1,3 +1,8 @@
+= 0.8.1 - 3-Sep-2015
+* The gem is now signed.
+* Updated Rakefile and gemspec to support signing.
+* Added a win32-process.rb stub for your convenience.
+
 = 0.8.0 - 29-Apr-2015
 * Added the Process.snapshot method that lets you gather information for
   the heap, threads, modules, and processes.
