@@ -99,7 +99,7 @@ module Process
       raise TypeError, int unless int.is_a?(Fixnum)   # Match spec
       int = Process.pid if int == 0                   # Match spec
 
-      handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, int)
+      handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, int)
 
       if handle == 0
         raise SystemCallError, FFI.errno, "OpenProcess"
@@ -141,7 +141,7 @@ module Process
       raise TypeError unless int_priority.is_a?(Integer)  # Match spec
       int = Process.pid if int == 0                       # Match spec
 
-      handle = OpenProcess(PROCESS_SET_INFORMATION, false , int)
+      handle = OpenProcess(PROCESS_SET_INFORMATION, 0 , int)
 
       if handle == 0
         raise SystemCallError, FFI.errno, "OpenProcess"
@@ -256,7 +256,7 @@ module Process
 
       # Put the current process in a job if it's not already in one
       if in_job && defined?(@win32_process_job_name)
-        handle = OpenJobObjectA(JOB_OBJECT_QUERY, true, @win32_process_job_name)
+        handle = OpenJobObjectA(JOB_OBJECT_QUERY, 1, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
       else
         @win32_process_job_name = 'ruby_' + Process.pid.to_s
@@ -347,7 +347,7 @@ module Process
 
       # Put the current process in a job if it's not already in one
       if in_job && defined? @win32_process_job_name
-        handle = OpenJobObjectA(JOB_OBJECT_SET_ATTRIBUTES, true, @win32_process_job_name)
+        handle = OpenJobObjectA(JOB_OBJECT_SET_ATTRIBUTES, 1, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
       else
         @win32_process_job_name = 'ruby_' + Process.pid.to_s
@@ -543,7 +543,7 @@ module Process
       if hash['process_inherit']
         process_security = SECURITY_ATTRIBUTES.new
         process_security[:nLength] = 12
-        process_security[:bInheritHandle] = true
+        process_security[:bInheritHandle] = 1
       end
 
       # Thread SECURITY_ATTRIBUTE structure
@@ -552,7 +552,7 @@ module Process
       if hash['thread_inherit']
         thread_security = SECURITY_ATTRIBUTES.new
         thread_security[:nLength] = 12
-        thread_security[:bInheritHandle] = true
+        thread_security[:bInheritHandle] = 1
       end
 
       # Automatically handle stdin, stdout and stderr as either IO objects
@@ -668,7 +668,7 @@ module Process
           raise SystemCallError.new("CreateProcessWithLogonW", FFI.errno)
         end
       else
-        inherit  = hash['inherit'] || false
+        inherit = hash['inherit'] ? 1 : 0
 
         bool = CreateProcessW(
           app,                    # App name
@@ -814,7 +814,7 @@ module Process
         end
 
         begin
-          handle = OpenProcess(access, false, pid)
+          handle = OpenProcess(access, 0, pid)
 
           if signal != 0 && handle == 0
             raise SystemCallError, FFI.errno, "OpenProcess"
@@ -890,7 +890,7 @@ module Process
     # when stdin, stdout or stderr are set to custom values.
     #
     def get_exitcode(pid)
-      handle = OpenProcess(PROCESS_QUERY_INFORMATION, false, pid)
+      handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
 
       if handle == INVALID_HANDLE_VALUE
         raise SystemCallError.new("OpenProcess", FFI.errno)

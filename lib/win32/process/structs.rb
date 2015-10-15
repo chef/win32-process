@@ -60,7 +60,7 @@ module Process::Structs
     layout(
       :nLength, :dword,
       :lpSecurityDescriptor, :pointer,
-      :bInheritHandle, :bool
+      :bInheritHandle, :int
     )
   end
 

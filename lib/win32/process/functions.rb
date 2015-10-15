@@ -39,7 +39,7 @@ module Process::Functions
   attach_pfunc :Module32First, [:handle, :pointer], :bool
   attach_pfunc :Module32Next, [:handle, :pointer], :bool
   attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
-  attach_pfunc :OpenProcess, [:dword, :bool, :dword], :handle
+  attach_pfunc :OpenProcess, [:dword, :int, :dword], :handle
   attach_pfunc :Process32First, [:handle, :pointer], :bool
   attach_pfunc :Process32Next, [:handle, :pointer], :bool
   attach_pfunc :SetHandleInformation, [:handle, :dword, :dword], :bool
@@ -57,12 +57,12 @@ module Process::Functions
     [:string, :pointer, :dword, :pointer, :pointer, :pointer, :pointer, :dword], :bool
 
   attach_pfunc :CreateProcessW,
-    [:buffer_in, :buffer_in, :pointer, :pointer, :bool,
+    [:buffer_in, :buffer_inout, :pointer, :pointer, :int,
      :dword, :buffer_in, :buffer_in, :pointer, :pointer], :bool
 
   attach_pfunc :AssignProcessToJobObject, [:handle, :handle], :bool
   attach_pfunc :CreateJobObjectA, [:pointer, :string], :handle
-  attach_pfunc :OpenJobObjectA, [:dword, :bool, :string], :handle
+  attach_pfunc :OpenJobObjectA, [:dword, :int, :string], :handle
   attach_pfunc :QueryInformationJobObject, [:handle, :int, :pointer, :dword, :pointer], :bool
   attach_pfunc :SetInformationJobObject, [:handle, :int, :pointer, :dword], :bool
   attach_pfunc :GetExitCodeProcess, [:handle, :pointer], :bool
