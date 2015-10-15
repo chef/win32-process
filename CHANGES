@@ -1,3 +1,9 @@
+= 0.8.2 - 15-Oct-2015
+* Fixed a declaration bug in the CreateProcess function prototype, and replaced
+  all instances of :bool with :int in function prototypes, along with
+  corresponding core code changes. Thanks go to Kartik Null Cating-Subramanian
+  for the spot.
+
 = 0.8.1 - 3-Sep-2015
 * The gem is now signed.
 * Updated Rakefile and gemspec to support signing.
