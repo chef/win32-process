@@ -2,7 +2,7 @@ require 'rubygems'
 
 Gem::Specification.new do |spec|
   spec.name       = 'win32-process'
-  spec.version    = '0.8.2'
+  spec.version    = '0.8.3'
   spec.license    = 'Artistic 2.0'
   spec.authors    = ['Daniel Berger', 'Park Heesob']
   spec.email      = 'djberg96@gmail.com'
@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.summary    = 'Adds and redefines several Process methods for MS Windows'
   spec.test_files = Dir['test/*.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
-  spec.cert_chain = ['certs/djberg96_pub.pem']
+  spec.cert_chain = Dir['certs/*']
 
   spec.extra_rdoc_files  = ['README', 'CHANGES', 'MANIFEST']
 
