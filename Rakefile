@@ -9,10 +9,10 @@ CLEAN.include('**/*.gem', '**/*.rbc', '**/*.log')
 namespace :gem do
   desc 'Create the win32-process gem'
   task :create => [:clean] do
+    require 'rubygems/package'
     spec = eval(IO.read('win32-process.gemspec'))
     spec.signing_key = File.join(Dir.home, '.ssh', 'gem-private_key.pem')
-    require 'rubygems/package'
-    Gem::Package.build(spec)
+    Gem::Package.build(spec, true)
   end
 
   desc 'Install the win32-process gem'
