@@ -7,10 +7,12 @@ require 'ffi'
 
 module Process::Functions
   module FFI::Library
-    # Wrapper method for attach_function + private
-    def attach_pfunc(*args)
-      attach_function(*args)
-      private args[0]
+    unless instance_methods.include?(:attach_pfunc)
+      # Wrapper method for attach_function + private
+      def attach_pfunc(*args)
+        attach_function(*args)
+        private args[0]
+      end
     end
   end
 
@@ -74,7 +76,7 @@ module Process::Functions
   attach_pfunc :OpenProcessToken, [:handle, :dword, :pointer], :bool
 
   attach_pfunc :CreateProcessWithLogonW,
-    [:buffer_in, :buffer_in, :buffer_in, :dword, :buffer_in, :buffer_in,
+    [:buffer_in, :buffer_in, :buffer_in, :dword, :buffer_in, :buffer_inout,
      :dword, :buffer_in, :buffer_in, :pointer, :pointer], :bool
 
   ffi_lib FFI::Library::LIBC
