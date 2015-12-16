@@ -1,3 +1,8 @@
+= 0.8.3 - 16-Dec-2015
+* Fixed a declaration in the CreateProcessWithLoginW function prototype. Thanks
+  go to ksubrama for the spot.
+* Only define attach_pfunc if not already defined to avoid potential warnings.
+
 = 0.8.2 - 15-Oct-2015
 * Fixed a declaration bug in the CreateProcess function prototype, and replaced
   all instances of :bool with :int in function prototypes, along with
