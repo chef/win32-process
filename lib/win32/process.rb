@@ -23,6 +23,52 @@ module Process
       pbool.read_int == 1 ? true : false
     end
 
+    # Get windows file handle for an IO obejct or fileno
+    def get_handle(io)
+
+      # Grab the handle
+      if io.respond_to?(:fileno)
+        handle = get_osfhandle(io.fileno)
+      else
+        handle = get_osfhandle(io)
+      end
+
+      # Error Check
+      if handle == INVALID_HANDLE_VALUE
+        ptr = FFI::MemoryPointer.new(:int)
+
+        if windows_version >= 6 && get_errno(ptr) == 0
+          errno = ptr.read_int
+        else
+          errno = FFI.errno
+        end
+
+        raise SystemCallError.new("get_osfhandle", errno)
+      end
+
+      return handle
+    end
+
+    # Set or unset the inheritable flag on a Windows File Handle for a 
+    # RUBY IO object or fileno.
+    def set_io_handle_inherit_flag(io, inherit)
+
+      # Grab the handle and set it
+      handle = get_handle(io)
+      set_handle_inherit_flag(handle, inherit)
+    end
+
+    # Set or unset the inheritable flag for Windows File Handle
+    def set_handle_inherit_flag(handle, inherit)
+
+      # Either set to HANDLE_FLAG_INHERIT or 0 based on true or false
+      flag = inherit ? HANDLE_FLAG_INHERIT : 0
+
+      # Set/unset inheritable flag
+      bool = SetHandleInformation(handle, HANDLE_FLAG_INHERIT, flag)
+      raise SystemCallError.new("SetHandleInformation", FFI.errno) unless bool
+    end
+
     # Returns the process and system affinity mask for the given +pid+, or the
     # current process if no pid is provided. The return value is a two element
     # array, with the first containing the process affinity mask, and the second
@@ -562,33 +608,11 @@ module Process
       #
       ['stdin', 'stdout', 'stderr'].each{ |io|
         if si_hash[io]
-          if si_hash[io].respond_to?(:fileno)
-            handle = get_osfhandle(si_hash[io].fileno)
-          else
-            handle = get_osfhandle(si_hash[io])
-          end
-
-          if handle == INVALID_HANDLE_VALUE
-            ptr = FFI::MemoryPointer.new(:int)
-
-            if windows_version >= 6 && get_errno(ptr) == 0
-              errno = ptr.read_int
-            else
-              errno = FFI.errno
-            end
-
-            raise SystemCallError.new("get_osfhandle", errno)
-          end
-
+          # Grab Windows Handle for Ruby IO or fileno
+          handle = get_handle(si_hash[io])
           # Most implementations of Ruby on Windows create inheritable
           # handles by default, but some do not. RF bug #26988.
-          bool = SetHandleInformation(
-            handle,
-            HANDLE_FLAG_INHERIT,
-            HANDLE_FLAG_INHERIT
-          )
-
-          raise SystemCallError.new("SetHandleInformation", FFI.errno) unless bool
+          set_handle_inherit_flag(handle, true)
 
           si_hash[io] = handle
           si_hash['startf_flags'] ||= 0
