@@ -6,11 +6,10 @@ Gem::Specification.new do |spec|
   spec.license    = 'Artistic 2.0'
   spec.authors    = ['Daniel Berger', 'Park Heesob']
   spec.email      = 'djberg96@gmail.com'
-  spec.homepage   = 'https://github.com/djberg96/win32-process'
+  spec.homepage   = 'https://github.com/chef/win32-process'
   spec.summary    = 'Adds and redefines several Process methods for MS Windows'
   spec.test_files = Dir['test/*.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
-  spec.cert_chain = Dir['certs/*']
 
   spec.extra_rdoc_files  = ['README.md', 'CHANGES', 'MANIFEST']
 
