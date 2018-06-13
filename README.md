@@ -6,11 +6,9 @@ This library provides analogues of the :getpriority, :setpriority, :getrlimit, :
 
 ## Prerequisites
 
-```
-* ffi
-* sys-proctable (dev only)
-* test-unit 2 (dev only)
-```
+- ffi
+- sys-proctable (dev only)
+- test-unit 2 (dev only)
 
 ## Supported Platforms
 
