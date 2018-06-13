@@ -1,0 +1,76 @@
+# win32-process
+
+[![Gem Version](https://badge.fury.io/rb/win32-process.svg)](https://badge.fury.io/rb/win32-process)
+
+This library provides analogues of the :getpriority, :setpriority, :getrlimit, :setrlimit and :uid methods for MS Windows. It also adds the new methods :job?, :get_affinity, and :create, and redefines the :kill method.
+
+## Prerequisites
+
+```
+* ffi
+* sys-proctable (dev only)
+* test-unit 2 (dev only)
+```
+
+## Supported Platforms
+
+This library is supported on Windows 2000 or later.
+
+## Installation
+
+```
+gem install win32-process
+```
+
+## Usage
+
+```ruby
+require 'win32/process'
+
+p Process.job? # => true or false
+
+info = Process.create( :app_name => "notepad.exe", :creation_flags => Process::DETACHED_PROCESS, :process_inherit => false, :thread_inherit => true, :cwd => "C:\" )
+
+p info.process_id
+```
+
+## Developer's Notes
+
+### Removal of Process.fork in release 0.7.0
+
+The Process.fork method was originally experimental but it has never been particularly useful in practice. On top of that, it required special implementations of the Process.waitXXX methods, so it was a maintenance issue as well.
+
+With Ruby 1.9 now becoming standard and its addition of Process.spawn and friends (and concomitant support for the Process.waitXXX methods) I felt it was time to remove it.
+
+You can still simulate Process.fork if you like using Process.create, which is how it was implemented internally anyway. A better solution might be to follow in the footsteps of ActiveState Perl, which uses native threads to simulate fork on Windows.
+
+### Changes in the custom Process.kill method for 0.7.0
+
+The Process.kill method in 0.7.0 more closely matches the spec now, but the internal method for killing processes is still nicer for most signals. With the release of 0.7.0 users can now specify options that provide finer control over how a process is killed. See the documentation for details.
+
+## The removal of the custom Process.ppid method
+
+This was added at some point in the Ruby 1.9 dev cycle so it was removed from this library.
+
+## Known Issues
+
+JRuby doesn't seem to like SIGBRK for Process.kill.
+
+Any issues or bugs should be reported on the project page at <https://github.com/djberg96/win32-process>.
+
+## License
+
+Artistic 2.0
+
+## Copyright
+
+(C) 2003-2015 Daniel J. Berger All Rights Reserved
+
+## Warranty
+
+This library is provided "as is" and without any express or implied warranties, including, without limitation, the implied warranties of merchantability and fitness for a particular purpose.
+
+## Author(s)
+
+- Park Heesob
+- Daniel J. Berger
