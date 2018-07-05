@@ -1,3 +1,4 @@
+require "rubygems"
 require 'rake'
 require 'rake/clean'
 require 'rake/testtask'
@@ -5,22 +6,6 @@ require 'rbconfig'
 include RbConfig
 
 CLEAN.include('**/*.gem', '**/*.rbc', '**/*.log')
-
-namespace :gem do
-  desc 'Create the win32-process gem'
-  task :create => [:clean] do
-    require 'rubygems/package'
-    spec = eval(IO.read('win32-process.gemspec'))
-    spec.signing_key = File.join(Dir.home, '.ssh', 'gem-private_key.pem')
-    Gem::Package.build(spec, true)
-  end
-
-  desc 'Install the win32-process gem'
-  task :install => [:create] do
-    file = Dir["*.gem"].first
-    sh "gem install -l #{file}"
-  end
-end
 
 namespace :example do
   desc 'Run the fork + wait example'
