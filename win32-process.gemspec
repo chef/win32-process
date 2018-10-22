@@ -1,5 +1,3 @@
-require 'rubygems'
-
 Gem::Specification.new do |spec|
   spec.name       = 'win32-process'
   spec.version    = '0.8.3'
@@ -11,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir['test/*.rb']
   spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
 
-  spec.extra_rdoc_files  = ['README.md', 'CHANGES', 'MANIFEST']
+  spec.extra_rdoc_files  = ['README.md', 'CHANGELOG.md']
 
   spec.required_ruby_version = '> 1.9.0'
   spec.add_dependency('ffi', '>= 1.0.0')
