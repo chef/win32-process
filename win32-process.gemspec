@@ -7,9 +7,9 @@ Gem::Specification.new do |spec|
   spec.homepage   = 'https://github.com/chef/win32-process'
   spec.summary    = 'Adds and redefines several Process methods for MS Windows'
   spec.test_files = Dir['test/*.rb']
-  spec.files      = Dir['**/*'].reject{ |f| f.include?('git') }
+  spec.files      = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(\..*|Gemfile|Rakefile|examples|test)}) }
 
-  spec.extra_rdoc_files  = ['README.md', 'CHANGES', 'MANIFEST']
+  spec.extra_rdoc_files  = ['README.md', 'CHANGELOG.md']
 
   spec.required_ruby_version = '> 1.9.0'
   spec.add_dependency('ffi', '>= 1.0.0')
