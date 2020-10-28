@@ -1,5 +1,11 @@
 # win32-process Changelog
 
+= 0.9.0 - 28-Oct-2020
+* Removed support for the Ruby $SAFE when killing processes to avoid deprecation warnings in Ruby 2.7+ and failures in Ruby 3.x releases
+* Shrunk the size of the gem package by not shipping test files in the package
+* Moved dev deps to the Gemfile so they can be more easily skipped
+* Update the gemspec to point to the current repository at github.com/chef/win32-process
+
 = 0.8.3 - 16-Dec-2015
 * Fixed a declaration in the CreateProcessWithLoginW function prototype. Thanks
   go to ksubrama for the spot.
@@ -62,7 +68,7 @@
 
 = 0.6.5 - 27-Dec-2010
 * Fixed getpriority and setpriority so that the underlying process handle is
-  always closed. Thanks go to Rafal Michalski	for the spot and patch. 
+  always closed. Thanks go to Rafal Michalski	for the spot and patch.
 * Updated getpriority and setpriority so that there are no longer any
   default arguments. This now matches the MRI spec.
 * Updated Process.create so that illegal options now raise an ArgumentError
