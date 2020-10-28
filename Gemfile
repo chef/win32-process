@@ -2,15 +2,13 @@ source "https://rubygems.org"
 
 gemspec
 
-group :docs do
-  gem "yard"
-  gem "redcarpet"
-  gem "github-markup"
-end
-
 group :debug do
   gem "pry"
   gem "pry-byebug"
   gem "pry-stack_explorer"
   gem "rb-readline"
+
+group :development do
+  gem "rake"
+  gem "test-unit", ">= 2.4.0"
 end
