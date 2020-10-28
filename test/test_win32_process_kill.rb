@@ -116,28 +116,6 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
   #  assert_raise(Errno::EPERM){ Process.kill(9, 1) }
   #end
 
-  test "kill raises a SecurityError if $SAFE level is 2 or greater" do
-    omit_if(@ruby == 'jruby')
-    assert_raise(SecurityError){
-      proc do
-        $SAFE = 2
-        @pid = Process.spawn(@cmd)
-        Process.kill(9, @pid)
-      end.call
-    }
-  end
-
-  test "kill works if the $SAFE level is 1 or lower" do
-    omit_if(@ruby == 'jruby')
-    assert_nothing_raised{
-      proc do
-        $SAFE = 1
-        @pid = Process.spawn(@cmd)
-        Process.kill(9, @pid)
-      end.call
-    }
-  end
-
 =begin
   test "kill(0) can't tell if the process ended, use get_exitcode instead" do
     pid = Process.create(
