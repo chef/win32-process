@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.authors    = ["Daniel Berger", "Park Heesob"]
   spec.email      = "djberg96@gmail.com"
   spec.homepage   = "https://github.com/chef/win32-process"
-  spec.summary    = "Adds and redefines several Process methods for MS Windows"
+  spec.summary    = "Adds and redefines several Process methods for Microsoft Windows"
   spec.test_files = Dir["test/*.rb"]
   spec.files      = `git ls-files -z`.split("\x0").reject { |f| f.match(/^(\..*|Gemfile|Rakefile|examples|test|CHANGELOG.md)/) }
 
