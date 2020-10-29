@@ -7,6 +7,7 @@ group :debug do
   gem "pry-byebug"
   gem "pry-stack_explorer"
   gem "rb-readline"
+end
 
 group :development do
   gem "rake"
