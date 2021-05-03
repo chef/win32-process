@@ -1,1 +1,1 @@
-require_relative 'win32/process'
+require_relative "win32/process"

@@ -27,8 +27,8 @@ sleep 1 # Give it a chance to start before checking for its pid
 
 pids = []
 
-ProcTable.ps{ |s|
+ProcTable.ps { |s|
   pids.push(s.pid) if s.cmdline =~ /notepad/i
 }
 
-p Process.kill(9,pids.last)
+p Process.kill(9, pids.last)

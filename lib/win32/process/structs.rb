@@ -1,9 +1,9 @@
-if RUBY_PLATFORM == 'java'
-  require 'rubygems'
-  gem 'ffi'
+if RUBY_PLATFORM == "java"
+  require "rubygems" unless defined?(Gem)
+  gem "ffi"
 end
 
-require 'ffi'
+require "ffi" unless defined?(FFI)
 
 module Process::Structs
   extend FFI::Library
@@ -11,8 +11,6 @@ module Process::Structs
   typedef :ulong, :dword
   typedef :uintptr_t, :handle
   typedef :short, :word
-
-  private
 
   # sizeof(LARGE_INTEGER) == 8
   class LARGE_INTEGER < FFI::Union
@@ -179,24 +177,21 @@ module Process::Structs
     :process_handle,
     :thread_handle,
     :process_id,
-    :thread_id
-  )
+    :thread_id)
 
   # Used by Process.snapshot
 
   ThreadSnapInfo = Struct.new("ThreadSnapInfo",
     :thread_id,
     :process_id,
-    :base_priority
-  )
+    :base_priority)
 
   HeapSnapInfo = Struct.new("HeapSnapInfo",
     :address,
     :block_size,
     :flags,
     :process_id,
-    :heap_id
-  )
+    :heap_id)
 
   ModuleSnapInfo = Struct.new("ModuleSnapInfo",
     :process_id,
@@ -204,8 +199,7 @@ module Process::Structs
     :module_size,
     :handle,
     :name,
-    :path
-  )
+    :path)
 
   ProcessSnapInfo = Struct.new("ProcessSnapInfo",
     :process_id,
@@ -213,6 +207,5 @@ module Process::Structs
     :parent_process_id,
     :priority,
     :flags,
-    :path
-  )
+    :path)
 end
