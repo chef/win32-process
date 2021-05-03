@@ -1,7 +1,7 @@
-require_relative 'process/functions'
-require_relative 'process/constants'
-require_relative 'process/structs'
-require_relative 'process/helper'
+require_relative "process/functions"
+require_relative "process/constants"
+require_relative "process/structs"
+require_relative "process/helper"
 
 module Process
   include Process::Constants
@@ -10,7 +10,7 @@ module Process
   extend Process::Constants
 
   # The version of the win32-process library.
-  WIN32_PROCESS_VERSION = '0.9.0'
+  WIN32_PROCESS_VERSION = "0.9.0"
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
@@ -95,9 +95,10 @@ module Process
     # 32768 => Process::ABOVE_NORMAL_PRIORITY_CLASS
     #
     def getpriority(kind, int)
-      raise TypeError, kind unless kind.is_a?(Fixnum) # Match spec
-      raise TypeError, int unless int.is_a?(Fixnum)   # Match spec
-      int = Process.pid if int == 0                   # Match spec
+      raise TypeError, kind unless kind.is_a?(Integer) # Match spec
+      raise TypeError, int unless int.is_a?(Integer)   # Match spec
+
+      int = Process.pid if int == 0 # Match spec
 
       handle = OpenProcess(PROCESS_QUERY_INFORMATION, 0, int)
 
@@ -139,6 +140,7 @@ module Process
       raise TypeError unless kind.is_a?(Integer)          # Match spec
       raise TypeError unless int.is_a?(Integer)           # Match spec
       raise TypeError unless int_priority.is_a?(Integer)  # Match spec
+
       int = Process.pid if int == 0                       # Match spec
 
       handle = OpenProcess(PROCESS_SET_INFORMATION, 0 , int)
@@ -155,7 +157,7 @@ module Process
         CloseHandle(handle)
       end
 
-      return 0 # Match the spec
+      0 # Match the spec
     end
 
     remove_method :uid
@@ -193,7 +195,7 @@ module Process
         raise SystemCallError, FFI.errno, "GetTokenInformation"
       end
 
-      string_sid = tuser[FFI.type_size(:pointer)*2, (rlength.read_ulong - FFI.type_size(:pointer)*2)]
+      string_sid = tuser[FFI.type_size(:pointer) * 2, (rlength.read_ulong - FFI.type_size(:pointer) * 2)]
 
       if sid
         string_sid
@@ -204,7 +206,7 @@ module Process
           raise SystemCallError, FFI.errno, "ConvertSidToStringSid"
         end
 
-        psid.read_pointer.read_string.split('-').last.to_i
+        psid.read_pointer.read_string.split("-").last.to_i
       end
     end
 
@@ -244,7 +246,7 @@ module Process
     #
     def getrlimit(resource)
       if resource == RLIMIT_FSIZE
-        if volume_type == 'NTFS'
+        if volume_type == "NTFS"
           return ((1024**4) * 4) - (1024 * 64) # ~ 4TB
         else
           return (1024**3) * 4 # 4 GB
@@ -259,7 +261,7 @@ module Process
         handle = OpenJobObjectA(JOB_OBJECT_QUERY, 1, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
       else
-        @win32_process_job_name = 'ruby_' + Process.pid.to_s
+        @win32_process_job_name = "ruby_" + Process.pid.to_s
         handle = CreateJobObjectA(nil, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "CreateJobObject" if handle == 0
       end
@@ -304,7 +306,7 @@ module Process
         end
 
       ensure
-        at_exit{ CloseHandle(handle) if handle }
+        at_exit { CloseHandle(handle) if handle }
       end
 
       [val, val]
@@ -350,7 +352,7 @@ module Process
         handle = OpenJobObjectA(JOB_OBJECT_SET_ATTRIBUTES, 1, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "OpenJobObject" if handle == 0
       else
-        @win32_process_job_name = 'ruby_' + Process.pid.to_s
+        @win32_process_job_name = "ruby_" + Process.pid.to_s
         handle = CreateJobObjectA(nil, @win32_process_job_name)
         raise SystemCallError, FFI.errno, "CreateJobObject" if handle == 0
       end
@@ -384,7 +386,7 @@ module Process
           raise SystemCallError, FFI.errno, "SetInformationJobObject"
         end
       ensure
-        at_exit{ CloseHandle(handle) if handle }
+        at_exit { CloseHandle(handle) if handle }
       end
     end
 
@@ -468,79 +470,81 @@ module Process
     # Process.spawn method instead of Process.create where possible.
     #
     def create(args)
-      unless args.kind_of?(Hash)
-        raise TypeError, 'hash keyword arguments expected'
+      unless args.is_a?(Hash)
+        raise TypeError, "hash keyword arguments expected"
       end
 
-      valid_keys = %w[
+      valid_keys = %w{
         app_name command_line inherit creation_flags cwd environment
         startup_info thread_inherit process_inherit close_handles with_logon
         domain password
-      ]
+      }
 
-      valid_si_keys = %w[
+      valid_si_keys = %w{
         startf_flags desktop title x y x_size y_size x_count_chars
         y_count_chars fill_attribute sw_flags stdin stdout stderr
-      ]
+      }
 
       # Set default values
       hash = {
-        'app_name'       => nil,
-        'creation_flags' => 0,
-        'close_handles'  => true
+        "app_name"       => nil,
+        "creation_flags" => 0,
+        "close_handles"  => true,
       }
 
       # Validate the keys, and convert symbols and case to lowercase strings.
-      args.each{ |key, val|
+      args.each { |key, val|
         key = key.to_s.downcase
         unless valid_keys.include?(key)
           raise ArgumentError, "invalid key '#{key}'"
         end
+
         hash[key] = val
       }
 
       si_hash = {}
 
       # If the startup_info key is present, validate its subkeys
-      if hash['startup_info']
-        hash['startup_info'].each{ |key, val|
+      if hash["startup_info"]
+        hash["startup_info"].each { |key, val|
           key = key.to_s.downcase
           unless valid_si_keys.include?(key)
             raise ArgumentError, "invalid startup_info key '#{key}'"
           end
+
           si_hash[key] = val
         }
       end
 
       # The +command_line+ key is mandatory unless the +app_name+ key
       # is specified.
-      unless hash['command_line']
-        if hash['app_name']
-          hash['command_line'] = hash['app_name']
-          hash['app_name'] = nil
+      unless hash["command_line"]
+        if hash["app_name"]
+          hash["command_line"] = hash["app_name"]
+          hash["app_name"] = nil
         else
-          raise ArgumentError, 'command_line or app_name must be specified'
+          raise ArgumentError, "command_line or app_name must be specified"
         end
       end
 
       env = nil
 
       # The env string should be passed as a string of ';' separated paths.
-      if hash['environment']
-        env = hash['environment']
+      if hash["environment"]
+        env = hash["environment"]
 
         unless env.respond_to?(:join)
-          env = hash['environment'].split(File::PATH_SEPARATOR)
+          env = hash["environment"].split(File::PATH_SEPARATOR)
         end
 
-        env = env.map{ |e| e + 0.chr }.join('') + 0.chr
-        env.to_wide_string! if hash['with_logon']
+        env = env.map { |e| e + 0.chr }.join("") + 0.chr
+        env.to_wide_string! if hash["with_logon"]
       end
 
       # Process SECURITY_ATTRIBUTE structure
       process_security = nil
 
-      if hash['process_inherit']
+      if hash["process_inherit"]
         process_security = SECURITY_ATTRIBUTES.new
         process_security[:nLength] = 12
         process_security[:bInheritHandle] = 1
@@ -549,7 +553,7 @@ module Process
       # Thread SECURITY_ATTRIBUTE structure
       thread_security = nil
 
-      if hash['thread_inherit']
+      if hash["thread_inherit"]
         thread_security = SECURITY_ATTRIBUTES.new
         thread_security[:nLength] = 12
         thread_security[:bInheritHandle] = 1
@@ -560,7 +564,7 @@ module Process
       # will not work on JRuby because of the way it handles internal file
       # descriptors.
       #
-      ['stdin', 'stdout', 'stderr'].each{ |io|
+      %w{stdin stdout stderr}.each { |io|
         if si_hash[io]
           if si_hash[io].respond_to?(:fileno)
             handle = get_osfhandle(si_hash[io].fileno)
@@ -591,9 +595,9 @@ module Process
           raise SystemCallError.new("SetHandleInformation", FFI.errno) unless bool
 
           si_hash[io] = handle
-          si_hash['startf_flags'] ||= 0
-          si_hash['startf_flags'] |= STARTF_USESTDHANDLES
-          hash['inherit'] = true
+          si_hash["startf_flags"] ||= 0
+          si_hash["startf_flags"] |= STARTF_USESTDHANDLES
+          hash["inherit"] = true
         end
       }
 
@@ -602,53 +606,53 @@ module Process
 
       unless si_hash.empty?
         startinfo[:cb]              = startinfo.size
-        startinfo[:lpDesktop]       = si_hash['desktop'] if si_hash['desktop']
-        startinfo[:lpTitle]         = si_hash['title'] if si_hash['title']
-        startinfo[:dwX]             = si_hash['x'] if si_hash['x']
-        startinfo[:dwY]             = si_hash['y'] if si_hash['y']
-        startinfo[:dwXSize]         = si_hash['x_size'] if si_hash['x_size']
-        startinfo[:dwYSize]         = si_hash['y_size'] if si_hash['y_size']
-        startinfo[:dwXCountChars]   = si_hash['x_count_chars'] if si_hash['x_count_chars']
-        startinfo[:dwYCountChars]   = si_hash['y_count_chars'] if si_hash['y_count_chars']
-        startinfo[:dwFillAttribute] = si_hash['fill_attribute'] if si_hash['fill_attribute']
-        startinfo[:dwFlags]         = si_hash['startf_flags'] if si_hash['startf_flags']
-        startinfo[:wShowWindow]     = si_hash['sw_flags'] if si_hash['sw_flags']
+        startinfo[:lpDesktop]       = si_hash["desktop"] if si_hash["desktop"]
+        startinfo[:lpTitle]         = si_hash["title"] if si_hash["title"]
+        startinfo[:dwX]             = si_hash["x"] if si_hash["x"]
+        startinfo[:dwY]             = si_hash["y"] if si_hash["y"]
+        startinfo[:dwXSize]         = si_hash["x_size"] if si_hash["x_size"]
+        startinfo[:dwYSize]         = si_hash["y_size"] if si_hash["y_size"]
+        startinfo[:dwXCountChars]   = si_hash["x_count_chars"] if si_hash["x_count_chars"]
+        startinfo[:dwYCountChars]   = si_hash["y_count_chars"] if si_hash["y_count_chars"]
+        startinfo[:dwFillAttribute] = si_hash["fill_attribute"] if si_hash["fill_attribute"]
+        startinfo[:dwFlags]         = si_hash["startf_flags"] if si_hash["startf_flags"]
+        startinfo[:wShowWindow]     = si_hash["sw_flags"] if si_hash["sw_flags"]
         startinfo[:cbReserved2]     = 0
-        startinfo[:hStdInput]       = si_hash['stdin'] if si_hash['stdin']
-        startinfo[:hStdOutput]      = si_hash['stdout'] if si_hash['stdout']
-        startinfo[:hStdError]       = si_hash['stderr'] if si_hash['stderr']
+        startinfo[:hStdInput]       = si_hash["stdin"] if si_hash["stdin"]
+        startinfo[:hStdOutput]      = si_hash["stdout"] if si_hash["stdout"]
+        startinfo[:hStdError]       = si_hash["stderr"] if si_hash["stderr"]
       end
 
       app = nil
       cmd = nil
 
       # Convert strings to wide character strings if present
-      if hash['app_name']
-        app = hash['app_name'].to_wide_string
+      if hash["app_name"]
+        app = hash["app_name"].to_wide_string
       end
 
-      if hash['command_line']
-        cmd = hash['command_line'].to_wide_string
+      if hash["command_line"]
+        cmd = hash["command_line"].to_wide_string
       end
 
-      if hash['cwd']
-        cwd = hash['cwd'].to_wide_string
+      if hash["cwd"]
+        cwd = hash["cwd"].to_wide_string
       end
 
-      if hash['with_logon']
-        logon = hash['with_logon'].to_wide_string
+      if hash["with_logon"]
+        logon = hash["with_logon"].to_wide_string
 
-        if hash['password']
-          passwd = hash['password'].to_wide_string
+        if hash["password"]
+          passwd = hash["password"].to_wide_string
         else
-          raise ArgumentError, 'password must be specified if with_logon is used'
+          raise ArgumentError, "password must be specified if with_logon is used"
         end
 
-        if hash['domain']
-          domain = hash['domain'].to_wide_string
+        if hash["domain"]
+          domain = hash["domain"].to_wide_string
         end
 
-        hash['creation_flags'] |= CREATE_UNICODE_ENVIRONMENT
+        hash["creation_flags"] |= CREATE_UNICODE_ENVIRONMENT
 
         bool = CreateProcessWithLogonW(
           logon,                  # User
@@ -657,7 +661,7 @@ module Process
           LOGON_WITH_PROFILE,     # Logon flags
           app,                    # App name
           cmd,                    # Command line
-          hash['creation_flags'], # Creation flags
+          hash["creation_flags"], # Creation flags
           env,                    # Environment
           cwd,                    # Working directory
           startinfo,              # Startup Info
@@ -668,7 +672,7 @@ module Process
           raise SystemCallError.new("CreateProcessWithLogonW", FFI.errno)
         end
       else
-        inherit = hash['inherit'] ? 1 : 0
+        inherit = hash["inherit"] ? 1 : 0
 
         bool = CreateProcessW(
           app,                    # App name
@@ -676,7 +680,7 @@ module Process
           process_security,       # Process attributes
           thread_security,        # Thread attributes
           inherit,                # Inherit handles?
-          hash['creation_flags'], # Creation flags
+          hash["creation_flags"], # Creation flags
           env,                    # Environment
           cwd,                    # Working directory
           startinfo,              # Startup Info
@@ -690,7 +694,7 @@ module Process
 
       # Automatically close the process and thread handles in the
       # PROCESS_INFORMATION struct unless explicitly told not to.
-      if hash['close_handles']
+      if hash["close_handles"]
         CloseHandle(procinfo[:hProcess])
         CloseHandle(procinfo[:hThread])
       end
@@ -760,8 +764,8 @@ module Process
       # Older versions of JRuby did not include KILL, so we've made an explicit exception
       # for that here, too.
       if signal.is_a?(String) || signal.is_a?(Symbol)
-        signal = signal.to_s.sub('SIG', '')
-        unless Signal.list.keys.include?(signal) || ['KILL', 'BRK'].include?(signal)
+        signal = signal.to_s.sub("SIG", "")
+        unless Signal.list.keys.include?(signal) || %w{KILL BRK}.include?(signal)
           raise ArgumentError, "unsupported name '#{signal}'"
         end
       end
@@ -771,32 +775,33 @@ module Process
         hash = pids.pop
         opts = {}
 
-        valid = %w[exit_proc dll_module wait_time]
+        valid = %w{exit_proc dll_module wait_time}
 
-        hash.each{ |k,v|
+        hash.each { |k, v|
           k = k.to_s.downcase
           unless valid.include?(k)
             raise ArgumentError, "invalid option '#{k}'"
           end
+
           opts[k] = v
         }
 
-        exit_proc  = opts['exit_proc']  || 'ExitProcess'
-        dll_module = opts['dll_module'] || 'kernel32'
-        wait_time  = opts['wait_time']  || 5
+        exit_proc  = opts["exit_proc"]  || "ExitProcess"
+        dll_module = opts["dll_module"] || "kernel32"
+        wait_time  = opts["wait_time"]  || 5
       else
         wait_time  = 5
-        exit_proc  = 'ExitProcess'
-        dll_module = 'kernel32'
+        exit_proc  = "ExitProcess"
+        dll_module = "kernel32"
       end
 
       count = 0
 
-      pids.each{ |pid|
+      pids.each { |pid|
         raise TypeError unless pid.is_a?(Numeric) # Match spec, pid must be a number
         raise SystemCallError.new(22) if pid < 0  # Match spec, EINVAL if pid less than zero
 
-        sigint = [Signal.list['INT'], 'INT', 'SIGINT', :INT, :SIGINT, 2]
+        sigint = [Signal.list["INT"], "INT", "SIGINT", :INT, :SIGINT, 2]
 
         # Match the spec
         if pid == 0 && !sigint.include?(signal)
@@ -829,19 +834,19 @@ module Process
                   raise SystemCallError.new(3) # ESRCH
                 end
               end
-            when Signal.list['INT'], 'INT', 'SIGINT', :INT, :SIGINT, 2
+            when Signal.list["INT"], "INT", "SIGINT", :INT, :SIGINT, 2
               if GenerateConsoleCtrlEvent(CTRL_C_EVENT, pid)
                 count += 1
               else
                 raise SystemCallError.new("GenerateConsoleCtrlEvent", FFI.errno)
               end
-            when Signal.list['BRK'], 'BRK', 'SIGBRK', :BRK, :SIGBRK, 3
+            when Signal.list["BRK"], "BRK", "SIGBRK", :BRK, :SIGBRK, 3
               if GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, pid)
                 count += 1
               else
                 raise SystemCallError.new("GenerateConsoleCtrlEvent", FFI.errno)
               end
-            when Signal.list['KILL'], 'KILL', 'SIGKILL', :KILL, :SIGKILL, 9
+            when Signal.list["KILL"], "KILL", "SIGKILL", :KILL, :SIGKILL, 9
               if TerminateProcess(handle, pid)
                 count += 1
               else
@@ -944,15 +949,15 @@ module Process
     #   # Show pids of all running processes
     #   p Process.snapshot(:process).keys
     #
-    def snapshot(info_type = 'thread')
+    def snapshot(info_type = "thread")
       case info_type.to_s.downcase
-        when 'thread'
+        when "thread"
           flag = TH32CS_SNAPTHREAD
-        when 'heap'
+        when "heap"
           flag = TH32CS_SNAPHEAPLIST
-        when 'module'
+        when "module"
           flag = TH32CS_SNAPMODULE
-        when 'process'
+        when "process"
           flag = TH32CS_SNAPPROCESS
         else
           raise ArgumentError, "info_type '#{info_type}' unsupported"
@@ -962,17 +967,17 @@ module Process
         handle = CreateToolhelp32Snapshot(flag, Process.pid)
 
         if handle == INVALID_HANDLE_VALUE
-          raise SystemCallError.new('CreateToolhelp32Snapshot', FFI.errno)
+          raise SystemCallError.new("CreateToolhelp32Snapshot", FFI.errno)
         end
 
         case info_type.to_s.downcase
-          when 'thread'
+          when "thread"
             array = get_thread_info(handle)
-          when 'heap'
+          when "heap"
             array = get_heap_info(handle)
-          when 'module'
+          when "module"
             array = get_module_info(handle)
-          when 'process'
+          when "process"
             array = get_process_info(handle)
         end
 
@@ -998,7 +1003,7 @@ module Process
       lpte = THREADENTRY32.new
       lpte[:dwSize] = lpte.size
 
-      hash = Hash.new{ |h,k| h[k] = [] }
+      hash = Hash.new { |h, k| h[k] = [] }
 
       if Thread32First(handle, lpte)
         hash[lpte[:th32OwnerProcessID]] << ThreadSnapInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
@@ -1006,20 +1011,18 @@ module Process
         if FFI.errno == ERROR_NO_MORE_FILES
           return hash
         else
-          raise SystemCallError.new('Thread32First', FFI.errno)
+          raise SystemCallError.new("Thread32First", FFI.errno)
         end
       end
 
-      while Thread32Next(handle, lpte)
-        hash[lpte[:th32OwnerProcessID]] << ThreadSnapInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri])
-      end
+      hash[lpte[:th32OwnerProcessID]] << ThreadSnapInfo.new(lpte[:th32ThreadID], lpte[:th32OwnerProcessID], lpte[:tpBasePri]) while Thread32Next(handle, lpte)
 
       hash
     end
 
     # Return heap info for Process.snapshot
     def get_heap_info(handle)
-      hash = Hash.new{ |h,k| h[k] = [] }
+      hash = Hash.new { |h, k| h[k] = [] }
 
       hl = HEAPLIST32.new
       hl[:dwSize] = hl.size
@@ -1035,13 +1038,11 @@ module Process
             if FFI.errno == ERROR_NO_MORE_FILES
               break
             else
-              raise SystemCallError.new('Heap32First', FFI.errno)
+              raise SystemCallError.new("Heap32First", FFI.errno)
             end
           end
 
-          while Heap32Next(he)
-            hash[he[:th32ProcessID]] << HeapSnapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID])
-          end
+          hash[he[:th32ProcessID]] << HeapSnapInfo.new(he[:dwAddress], he[:dwBlockSize], he[:dwFlags], he[:th32ProcessID], he[:th32HeapID]) while Heap32Next(he)
         end
       end
 
@@ -1050,7 +1051,7 @@ module Process
 
     # Return module info for Process.snapshot
     def get_module_info(handle)
-      hash = Hash.new{ |h,k| h[k] = [] }
+      hash = Hash.new { |h, k| h[k] = [] }
 
       me = MODULEENTRY32.new
       me[:dwSize] = me.size
@@ -1068,7 +1069,7 @@ module Process
         if FFI.errno == ERROR_NO_MORE_FILES
           return hash
         else
-          raise SystemCallError.new('Module32First', FFI.errno)
+          raise SystemCallError.new("Module32First", FFI.errno)
         end
       end
 
@@ -1088,7 +1089,7 @@ module Process
 
     # Return process info for Process.snapshot
     def get_process_info(handle)
-      hash = Hash.new{ |h,k| h[k] = [] }
+      hash = Hash.new { |h, k| h[k] = [] }
 
       pe = PROCESSENTRY32.new
       pe[:dwSize] = pe.size
@@ -1106,7 +1107,7 @@ module Process
         if FFI.errno == ERROR_NO_MORE_FILES
           return hash
         else
-          raise SystemCallError.new('Process32First', FFI.errno)
+          raise SystemCallError.new("Process32First", FFI.errno)
         end
       end
 

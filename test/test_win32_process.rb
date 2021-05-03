@@ -11,13 +11,13 @@
 #
 # You should run this test case via the 'rake test' task.
 ###############################################################################
-require 'test-unit'
-require 'win32/process'
+require "test-unit"
+require "win32/process"
 
 class TC_Win32Process < Test::Unit::TestCase
   def self.startup
     @@pids  = []
-    @@jruby = RUBY_PLATFORM == 'java'
+    @@jruby = RUBY_PLATFORM == "java"
   end
 
   def setup
@@ -25,7 +25,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "win32-process version is set to the correct value" do
-    assert_equal('0.9.0', Process::WIN32_PROCESS_VERSION)
+    assert_equal("0.9.0", Process::WIN32_PROCESS_VERSION)
   end
 
   test "create basic functionality" do
@@ -33,76 +33,76 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "create with common flags works as expected" do
-    assert_nothing_raised{
+    assert_nothing_raised {
       @@pids << Process.create(
-         :app_name         => "notepad.exe",
-         :creation_flags   => Process::DETACHED_PROCESS,
-         :process_inherit  => false,
-         :thread_inherit   => true,
-         :cwd              => "C:\\"
-      ).process_id
+         app_name: "notepad.exe",
+         creation_flags: Process::DETACHED_PROCESS,
+         process_inherit: false,
+         thread_inherit: true,
+         cwd: "C:\\"
+       ).process_id
     }
 
-    assert_nothing_raised{ Process.kill(9, @@pids.pop) }
+    assert_nothing_raised { Process.kill(9, @@pids.pop) }
   end
 
   test "create requires a hash argument" do
-    assert_raise(TypeError){ Process.create("bogusapp.exe") }
+    assert_raise(TypeError) { Process.create("bogusapp.exe") }
   end
 
   test "create does not accept invalid keys" do
-    assert_raise(ArgumentError){ Process.create(:bogus => 'test.exe') }
-    assert_raise_message("invalid key 'bogus'"){
-      Process.create(:bogus => 'test.exe')
+    assert_raise(ArgumentError) { Process.create(bogus: "test.exe") }
+    assert_raise_message("invalid key 'bogus'") {
+      Process.create(bogus: "test.exe")
     }
   end
 
   test "create does not accept invalid startup_info keys" do
-    assert_raise(ArgumentError){
-      Process.create(:startup_info => {:foo => 'test'})
+    assert_raise(ArgumentError) {
+      Process.create(startup_info: { foo: "test" })
     }
-    assert_raise_message("invalid startup_info key 'foo'"){
-      Process.create(:startup_info => {:foo => 'test'})
+    assert_raise_message("invalid startup_info key 'foo'") {
+      Process.create(startup_info: { foo: "test" })
     }
   end
 
   test "create raises an error if the executable cannot be found" do
-    assert_raise(Errno::ENOENT){ Process.create(:app_name => "bogusapp.exe") }
+    assert_raise(Errno::ENOENT) { Process.create(app_name: "bogusapp.exe") }
   end
 
   test "create passes local environment when environment is not specified" do
     omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
-    ENV['AARDVARK'] = 'B'
+    ENV["AARDVARK"] = "B"
     assert_nothing_raised {
       Process.create(
-        :app_name         => 'cmd.exe /c echo %AARDVARK%',
-        :creation_flags   => Process::DETACHED_PROCESS,
-        :startup_info     => { :stdout => stdout_write }
+        app_name: "cmd.exe /c echo %AARDVARK%",
+        creation_flags: Process::DETACHED_PROCESS,
+        startup_info: { stdout: stdout_write }
       )
     }
 
     stdout_write.close
-    assert_equal('B', stdout_read.read.chomp)
+    assert_equal("B", stdout_read.read.chomp)
   end
 
   test "create does not pass local environment when environment is specified" do
     omit_if(@@jruby)
     stdout_read, stdout_write = IO.pipe
 
-    ENV['AARDVARK'] = 'B'
+    ENV["AARDVARK"] = "B"
     assert_nothing_raised {
       Process.create(
-        :app_name         => 'cmd.exe /c echo %AARDVARK%',
-        :creation_flags   => Process::DETACHED_PROCESS,
-        :environment      => "",
-        :startup_info     => { :stdout => stdout_write }
+        app_name: "cmd.exe /c echo %AARDVARK%",
+        creation_flags: Process::DETACHED_PROCESS,
+        environment: "",
+        startup_info: { stdout: stdout_write }
       )
     }
 
     stdout_write.close
-    assert_equal('%AARDVARK%', stdout_read.read.chomp)
+    assert_equal("%AARDVARK%", stdout_read.read.chomp)
   end
 
   test "create supports :environment as a string" do
@@ -111,10 +111,10 @@ class TC_Win32Process < Test::Unit::TestCase
 
     assert_nothing_raised {
       Process.create(
-        :app_name         => 'cmd.exe /c echo %A% %C%',
-        :creation_flags   => Process::DETACHED_PROCESS,
-        :environment      => "A=B;C=D",
-        :startup_info     => { :stdout => stdout_write }
+        app_name: "cmd.exe /c echo %A% %C%",
+        creation_flags: Process::DETACHED_PROCESS,
+        environment: "A=B;C=D",
+        startup_info: { stdout: stdout_write }
       )
     }
 
@@ -128,10 +128,10 @@ class TC_Win32Process < Test::Unit::TestCase
 
     assert_nothing_raised {
       Process.create(
-        :app_name         => 'cmd.exe /c echo %A% %C%',
-        :creation_flags   => Process::DETACHED_PROCESS,
-        :environment      => [ "A=B;X;", "C=;D;Y" ],
-        :startup_info     => { :stdout => stdout_write }
+        app_name: "cmd.exe /c echo %A% %C%",
+        creation_flags: Process::DETACHED_PROCESS,
+        environment: [ "A=B;X;", "C=;D;Y" ],
+        startup_info: { stdout: stdout_write }
       )
     }
 
@@ -142,9 +142,9 @@ class TC_Win32Process < Test::Unit::TestCase
   test "create supports empty :environment string" do
     assert_nothing_raised {
       Process.create(
-        :creation_flags => Process::DETACHED_PROCESS,
-        :app_name       => 'cmd.exe',
-        :environment    => ''
+        creation_flags: Process::DETACHED_PROCESS,
+        app_name: "cmd.exe",
+        environment: ""
       )
     }
   end
@@ -152,21 +152,21 @@ class TC_Win32Process < Test::Unit::TestCase
   test "create supports empty :environment array" do
     assert_nothing_raised {
       Process.create(
-        :creation_flags   => Process::DETACHED_PROCESS,
-        :app_name    => 'cmd.exe',
-        :environment => []
+        creation_flags: Process::DETACHED_PROCESS,
+        app_name: "cmd.exe",
+        environment: []
       )
     }
   end
 
   test "uid basic functionality" do
     assert_respond_to(Process, :uid)
-    assert_kind_of(Fixnum, Process.uid)
+    assert_kind_of(Integer, Process.uid)
   end
 
   test "uid accepts a boolean argument" do
-    assert_nothing_raised{ Process.uid(true) }
-    assert_nothing_raised{ Process.uid(true) }
+    assert_nothing_raised { Process.uid(true) }
+    assert_nothing_raised { Process.uid(true) }
   end
 
   test "uid returns a string if its argument is true" do
@@ -174,36 +174,36 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "uid accepts a maximum of one argument" do
-    assert_raise(ArgumentError){ Process.uid(true, true) }
+    assert_raise(ArgumentError) { Process.uid(true, true) }
   end
 
   test "argument to uid must be a boolean" do
-    assert_raise(TypeError){ Process.uid('test') }
+    assert_raise(TypeError) { Process.uid("test") }
   end
 
   test "getpriority basic functionality" do
     assert_respond_to(Process, :getpriority)
-    assert_nothing_raised{ Process.getpriority(Process::PRIO_PROCESS, Process.pid) }
-    assert_kind_of(Fixnum, Process.getpriority(Process::PRIO_PROCESS, Process.pid))
+    assert_nothing_raised { Process.getpriority(Process::PRIO_PROCESS, Process.pid) }
+    assert_kind_of(Integer, Process.getpriority(Process::PRIO_PROCESS, Process.pid))
   end
 
   test "getpriority treats an int argument of zero as the current process" do
-    assert_nothing_raised{ Process.getpriority(0, 0) }
+    assert_nothing_raised { Process.getpriority(0, 0) }
   end
 
   test "getpriority requires both a kind and an int" do
-    assert_raise(ArgumentError){ Process.getpriority }
-    assert_raise(ArgumentError){ Process.getpriority(Process::PRIO_PROCESS) }
+    assert_raise(ArgumentError) { Process.getpriority }
+    assert_raise(ArgumentError) { Process.getpriority(Process::PRIO_PROCESS) }
   end
 
   test "getpriority requires integer arguments" do
-    assert_raise(TypeError){ Process.getpriority('test', 0) }
-    assert_raise(TypeError){ Process.getpriority(Process::PRIO_PROCESS, 'test') }
+    assert_raise(TypeError) { Process.getpriority("test", 0) }
+    assert_raise(TypeError) { Process.getpriority(Process::PRIO_PROCESS, "test") }
   end
 
   test "setpriority basic functionality" do
     assert_respond_to(Process, :setpriority)
-    assert_nothing_raised{ Process.setpriority(0, Process.pid, @priority) }
+    assert_nothing_raised { Process.setpriority(0, Process.pid, @priority) }
     assert_equal(@priority, Process.getpriority(0, Process.pid))
   end
 
@@ -216,15 +216,15 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "setpriority requires at least three arguments" do
-    assert_raise(ArgumentError){ Process.setpriority }
-    assert_raise(ArgumentError){ Process.setpriority(0) }
-    assert_raise(ArgumentError){ Process.setpriority(0, 0) }
+    assert_raise(ArgumentError) { Process.setpriority }
+    assert_raise(ArgumentError) { Process.setpriority(0) }
+    assert_raise(ArgumentError) { Process.setpriority(0, 0) }
   end
 
   test "arguments to setpriority must be numeric" do
-    assert_raise(TypeError){ Process.setpriority('test', 0, @priority) }
-    assert_raise(TypeError){ Process.setpriority(0, 'test', @priority) }
-    assert_raise(TypeError){ Process.setpriority(0, 0, 'test') }
+    assert_raise(TypeError) { Process.setpriority("test", 0, @priority) }
+    assert_raise(TypeError) { Process.setpriority(0, "test", @priority) }
+    assert_raise(TypeError) { Process.setpriority(0, 0, "test") }
   end
 
   test "custom creation constants are defined" do
@@ -243,8 +243,8 @@ class TC_Win32Process < Test::Unit::TestCase
 
   test "getrlimit basic functionality" do
     assert_respond_to(Process, :getrlimit)
-    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
-    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_FSIZE) }
+    assert_nothing_raised { Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised { Process.getrlimit(Process::RLIMIT_FSIZE) }
   end
 
   test "getrlimit returns an array of two numeric elements" do
@@ -254,18 +254,18 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "getrlimit can be called multiple times without issue" do
-    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
-    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
-    assert_nothing_raised{ Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised { Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised { Process.getrlimit(Process::RLIMIT_CPU) }
+    assert_nothing_raised { Process.getrlimit(Process::RLIMIT_CPU) }
   end
 
   test "getrlimit requires a valid resource value" do
-    assert_raise(ArgumentError){ Process.getrlimit(9999) }
+    assert_raise(ArgumentError) { Process.getrlimit(9999) }
   end
 
   test "setrlimit basic functionality" do
     assert_respond_to(Process, :setrlimit)
-    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
+    assert_nothing_raised { Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
   end
 
   test "setrlimit returns nil on success" do
@@ -273,17 +273,17 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "setrlimit sets the resource limit as expected" do
-    assert_nothing_raised{ Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
+    assert_nothing_raised { Process.setrlimit(Process::RLIMIT_CPU, 1000000) }
     assert_equal([1000000, 1000000], Process.getrlimit(Process::RLIMIT_CPU))
   end
 
   test "setrlimit raises an error if the resource value is invalid" do
-    assert_raise(ArgumentError){ Process.setrlimit(9999, 100) }
+    assert_raise(ArgumentError) { Process.setrlimit(9999, 100) }
   end
 
   test "is_job basic functionality" do
     assert_respond_to(Process, :job?)
-    assert_nothing_raised{ Process.job? }
+    assert_nothing_raised { Process.job? }
   end
 
   test "is_job returns a boolean value" do
@@ -291,7 +291,7 @@ class TC_Win32Process < Test::Unit::TestCase
   end
 
   test "is_job does not accept any arguments" do
-    assert_raise(ArgumentError){ Process.job?(Process.pid) }
+    assert_raise(ArgumentError) { Process.job?(Process.pid) }
   end
 
   test "volume_type is a private method" do
@@ -300,19 +300,19 @@ class TC_Win32Process < Test::Unit::TestCase
 
   test "snapshot method basic functionality" do
     assert_respond_to(Process, :snapshot)
-    assert_nothing_raised{ Process.snapshot }
+    assert_nothing_raised { Process.snapshot }
     assert_kind_of(Hash, Process.snapshot)
   end
 
   test "snapshot accepts :thread, :module or :heap arguments" do
-    assert_nothing_raised{ Process.snapshot(:thread) }
-    assert_nothing_raised{ Process.snapshot(:module) }
-    #assert_nothing_raised{ Process.snapshot(:heap) }
-    assert_nothing_raised{ Process.snapshot(:process) }
+    assert_nothing_raised { Process.snapshot(:thread) }
+    assert_nothing_raised { Process.snapshot(:module) }
+    # assert_nothing_raised{ Process.snapshot(:heap) }
+    assert_nothing_raised { Process.snapshot(:process) }
   end
 
   test "snapshot raises an error if an invalid argument is passed" do
-    assert_raise(ArgumentError){ Process.snapshot(:bogus) }
+    assert_raise(ArgumentError) { Process.snapshot(:bogus) }
   end
 
   test "ffi functions are private" do

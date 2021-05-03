@@ -1,9 +1,9 @@
-if RUBY_PLATFORM == 'java'
-  require 'rubygems'
-  gem 'ffi'
+if RUBY_PLATFORM == "java"
+  require "rubygems" unless defined?(Gem)
+  gem "ffi"
 end
 
-require 'ffi'
+require "ffi" unless defined?(FFI)
 
 module Process::Functions
   module FFI::Library
@@ -26,58 +26,58 @@ module Process::Functions
   ffi_lib :kernel32
 
   attach_pfunc :CloseHandle, [:handle], :bool
-  attach_pfunc :CreateToolhelp32Snapshot, [:dword, :dword], :handle
-  attach_pfunc :GenerateConsoleCtrlEvent, [:dword, :dword], :bool
+  attach_pfunc :CreateToolhelp32Snapshot, %i{dword dword}, :handle
+  attach_pfunc :GenerateConsoleCtrlEvent, %i{dword dword}, :bool
   attach_pfunc :GetCurrentProcess, [], :handle
   attach_pfunc :GetModuleHandle, :GetModuleHandleA, [:string], :hmodule
-  attach_pfunc :GetProcessAffinityMask, [:handle, :pointer, :pointer], :bool
+  attach_pfunc :GetProcessAffinityMask, %i{handle pointer pointer}, :bool
   attach_pfunc :GetPriorityClass, [:handle], :dword
-  attach_pfunc :GetProcAddress, [:hmodule, :string], :pointer
+  attach_pfunc :GetProcAddress, %i{hmodule string}, :pointer
   attach_pfunc :GetVersionExA, [:pointer], :bool
-  attach_pfunc :Heap32ListFirst, [:handle, :pointer], :bool
-  attach_pfunc :Heap32ListNext, [:handle, :pointer], :bool
-  attach_pfunc :Heap32First, [:pointer, :dword, :uintptr_t], :bool
+  attach_pfunc :Heap32ListFirst, %i{handle pointer}, :bool
+  attach_pfunc :Heap32ListNext, %i{handle pointer}, :bool
+  attach_pfunc :Heap32First, %i{pointer dword uintptr_t}, :bool
   attach_pfunc :Heap32Next, [:pointer], :bool
-  attach_pfunc :Module32First, [:handle, :pointer], :bool
-  attach_pfunc :Module32Next, [:handle, :pointer], :bool
-  attach_pfunc :IsProcessInJob, [:handle, :pointer, :pointer], :bool # 2nd arg optional
-  attach_pfunc :OpenProcess, [:dword, :int, :dword], :handle
-  attach_pfunc :Process32First, [:handle, :pointer], :bool
-  attach_pfunc :Process32Next, [:handle, :pointer], :bool
-  attach_pfunc :SetHandleInformation, [:handle, :dword, :dword], :bool
+  attach_pfunc :Module32First, %i{handle pointer}, :bool
+  attach_pfunc :Module32Next, %i{handle pointer}, :bool
+  attach_pfunc :IsProcessInJob, %i{handle pointer pointer}, :bool # 2nd arg optional
+  attach_pfunc :OpenProcess, %i{dword int dword}, :handle
+  attach_pfunc :Process32First, %i{handle pointer}, :bool
+  attach_pfunc :Process32Next, %i{handle pointer}, :bool
+  attach_pfunc :SetHandleInformation, %i{handle dword dword}, :bool
   attach_pfunc :SetErrorMode, [:uint], :uint
-  attach_pfunc :SetPriorityClass, [:handle, :dword], :bool
-  attach_pfunc :TerminateProcess, [:handle, :uint], :bool
-  attach_pfunc :Thread32First, [:handle, :pointer], :bool
-  attach_pfunc :Thread32Next, [:handle, :pointer], :bool
-  attach_pfunc :WaitForSingleObject, [:handle, :dword], :dword
+  attach_pfunc :SetPriorityClass, %i{handle dword}, :bool
+  attach_pfunc :TerminateProcess, %i{handle uint}, :bool
+  attach_pfunc :Thread32First, %i{handle pointer}, :bool
+  attach_pfunc :Thread32Next, %i{handle pointer}, :bool
+  attach_pfunc :WaitForSingleObject, %i{handle dword}, :dword
 
   attach_pfunc :CreateRemoteThread,
-    [:handle, :pointer, :size_t, :pointer, :pointer, :dword, :pointer], :handle
+    %i{handle pointer size_t pointer pointer dword pointer}, :handle
 
   attach_pfunc :GetVolumeInformationA,
-    [:string, :pointer, :dword, :pointer, :pointer, :pointer, :pointer, :dword], :bool
+    %i{string pointer dword pointer pointer pointer pointer dword}, :bool
 
   attach_pfunc :CreateProcessW,
-    [:buffer_in, :buffer_inout, :pointer, :pointer, :int,
-     :dword, :buffer_in, :buffer_in, :pointer, :pointer], :bool
+    %i{buffer_in buffer_inout pointer pointer int
+     dword buffer_in buffer_in pointer pointer}, :bool
 
-  attach_pfunc :AssignProcessToJobObject, [:handle, :handle], :bool
-  attach_pfunc :CreateJobObjectA, [:pointer, :string], :handle
-  attach_pfunc :OpenJobObjectA, [:dword, :int, :string], :handle
-  attach_pfunc :QueryInformationJobObject, [:handle, :int, :pointer, :dword, :pointer], :bool
-  attach_pfunc :SetInformationJobObject, [:handle, :int, :pointer, :dword], :bool
-  attach_pfunc :GetExitCodeProcess, [:handle, :pointer], :bool
+  attach_pfunc :AssignProcessToJobObject, %i{handle handle}, :bool
+  attach_pfunc :CreateJobObjectA, %i{pointer string}, :handle
+  attach_pfunc :OpenJobObjectA, %i{dword int string}, :handle
+  attach_pfunc :QueryInformationJobObject, %i{handle int pointer dword pointer}, :bool
+  attach_pfunc :SetInformationJobObject, %i{handle int pointer dword}, :bool
+  attach_pfunc :GetExitCodeProcess, %i{handle pointer}, :bool
 
   ffi_lib :advapi32
 
-  attach_pfunc :ConvertSidToStringSidA, [:buffer_in, :pointer], :bool
-  attach_pfunc :GetTokenInformation, [:handle, :int, :pointer, :dword, :pointer], :bool
-  attach_pfunc :OpenProcessToken, [:handle, :dword, :pointer], :bool
+  attach_pfunc :ConvertSidToStringSidA, %i{buffer_in pointer}, :bool
+  attach_pfunc :GetTokenInformation, %i{handle int pointer dword pointer}, :bool
+  attach_pfunc :OpenProcessToken, %i{handle dword pointer}, :bool
 
   attach_pfunc :CreateProcessWithLogonW,
-    [:buffer_in, :buffer_in, :buffer_in, :dword, :buffer_in, :buffer_inout,
-     :dword, :buffer_in, :buffer_in, :pointer, :pointer], :bool
+    %i{buffer_in buffer_in buffer_in dword buffer_in buffer_inout
+     dword buffer_in buffer_in pointer pointer}, :bool
 
   ffi_lib FFI::Library::LIBC
 

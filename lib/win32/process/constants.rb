@@ -1,9 +1,7 @@
-require 'ffi'
+require "ffi" unless defined?(FFI)
 
 module Process::Constants
   include FFI::Library
-
-  private
 
   # Priority constants
 
