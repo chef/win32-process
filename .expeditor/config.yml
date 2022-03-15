@@ -17,7 +17,7 @@ github:
     - "Expeditor: Bump Version Minor"     
 
 release_branches:
-  - ffi:
+  - main:
       version_constraint: "0.*"
 
 changelog:
