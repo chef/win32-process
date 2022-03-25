@@ -1,21 +1,17 @@
 # win32-process Changelog
 
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
-<!-- latest_release 0.9.0 -->
-= 0.9.0 - 28-Oct-2020
-* Removed support for the Ruby $SAFE when killing processes to avoid deprecation warnings in Ruby 2.7+ and failures in Ruby 3.x releases
-* Shrunk the size of the gem package by not shipping test files in the package
-* Moved dev deps to the Gemfile so they can be more easily skipped
-* Update the gemspec to point to the current repository at github.com/chef/win32-process
+<!-- latest_release 0.9.1 -->
+## [win32-process-0.9.1](https://github.com/chef/win32-process/tree/win32-process-0.9.1) (2022-03-25)
 
+#### Merged Pull Requests
+- Create empty verify pipeline for chef/win32-process [#37](https://github.com/chef/win32-process/pull/37) ([skeshari12](https://github.com/skeshari12))
 <!-- latest_release -->
 <!-- release_rollup since=0.8.3 -->
-
 = 0.8.3 - 16-Dec-2015
 * Fixed a declaration in the CreateProcessWithLoginW function prototype. Thanks
   go to ksubrama for the spot.
 * Only define attach_pfunc if not already defined to avoid potential warnings.
-
 <!-- release_rollup -->
 <!-- latest_stable_release -->
 = 0.8.2 - 15-Oct-2015
