@@ -11,5 +11,6 @@ end
 
 group :development do
   gem "rake"
-  gem "test-unit", ">= 2.4.0"
+  gem "yard"
+  gem "test-unit"
 end
