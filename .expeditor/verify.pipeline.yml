@@ -19,6 +19,7 @@ steps:
     executor:
       docker:
         host_os: windows
+        user: 'NT AUTHORITY\SYSTEM'
         shell: ["powershell"]
         image: rubydistros/windows-2019:3.0
 
@@ -30,5 +31,6 @@ steps:
     executor:
       docker:
         host_os: windows
+        user: 'NT AUTHORITY\SYSTEM'
         shell: ["powershell"]
         image: rubydistros/windows-2019:3.1
