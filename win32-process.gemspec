@@ -1,3 +1,5 @@
+require_relative "lib/win32/process/version"
+
 Gem::Specification.new do |spec|
   spec.name       = "win32-process"
   spec.version    = Win32::Process::VERSION
@@ -9,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir["test/*.rb"]
   spec.files      = `git ls-files -z`.split("\x0").reject { |f| f.match(/^(\..*|Gemfile|Rakefile|examples|test|CHANGELOG.md|README.md)/) }
 
-  spec.required_ruby_version = ">= 2.4" # required for the use of Integer
+  spec.required_ruby_version = ">= 2.7" # required for the use of Integer
   spec.add_dependency("ffi", ">= 1.0.0")
 
   spec.description = <<-EOF
