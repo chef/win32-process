@@ -1,11 +1,11 @@
 # win32-process Changelog
 
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
-<!-- latest_release 0.9.1 -->
-## [win32-process-0.9.1](https://github.com/chef/win32-process/tree/win32-process-0.9.1) (2022-03-25)
+<!-- latest_release 0.10.0 -->
+## [win32-process-0.10.0](https://github.com/chef/win32-process/tree/win32-process-0.10.0) (2022-04-19)
 
 #### Merged Pull Requests
-- Create empty verify pipeline for chef/win32-process [#37](https://github.com/chef/win32-process/pull/37) ([skeshari12](https://github.com/skeshari12))
+- Testing Ruby 3.1 support [#39](https://github.com/chef/win32-process/pull/39) ([johnmccrae](https://github.com/johnmccrae))
 <!-- latest_release -->
 <!-- release_rollup since=0.8.3 -->
 = 0.8.3 - 16-Dec-2015
