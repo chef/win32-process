@@ -1,18 +1,13 @@
 # win32-process Changelog
 
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
-<!-- latest_release 0.10.0 -->
-## [win32-process-0.10.0](https://github.com/chef/win32-process/tree/win32-process-0.10.0) (2022-04-19)
-
-#### Merged Pull Requests
-- Testing Ruby 3.1 support [#39](https://github.com/chef/win32-process/pull/39) ([johnmccrae](https://github.com/johnmccrae))
 <!-- latest_release -->
-<!-- release_rollup since=0.8.3 -->
-= 0.8.3 - 16-Dec-2015
-* Fixed a declaration in the CreateProcessWithLoginW function prototype. Thanks
-  go to ksubrama for the spot.
-* Only define attach_pfunc if not already defined to avoid potential warnings.
+<!-- latest_release -->
 <!-- release_rollup -->
+<!-- release_rollup -->
+
+<!-- latest_stable_release -->
+## [win32-process-0.10.0](https://github.com/chef/win32-process/tree/win32-process-0.10.0) (2022-04-19)
 <!-- latest_stable_release -->
 = 0.8.2 - 15-Oct-2015
 * Fixed a declaration bug in the CreateProcess function prototype, and replaced
