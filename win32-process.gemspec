@@ -11,8 +11,8 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir["test/*.rb"]
   spec.files      = `git ls-files -z`.split("\x0").reject { |f| f.match(/^(\..*|Gemfile|Rakefile|examples|test|CHANGELOG.md|README.md)/) }
 
-  spec.required_ruby_version = ">= 2.7" # required for the use of Integer
-  spec.add_dependency("ffi", ">= 1.0.0")
+  spec.required_ruby_version = ">= 3.1.6" # required for the use of Integer
+  spec.add_dependency("ffi", ">= 1.15.5", "< 1.17.0")
 
   spec.description = <<-EOF
     The win32-process library implements several Process methods that are
