@@ -68,7 +68,7 @@ module Process::Constants
 
   # Security
 
-  TokenUser   = 1
+  TokenUser   = 1 # rubocop:disable Naming/ConstantName
   TOKEN_QUERY = 0x00000008
 
   # Define these for Windows. They are not actually used but are defined
@@ -92,7 +92,7 @@ module Process::Constants
   JOB_OBJECT_QUERY                = 0x00000004
   JOB_OBJECT_LIMIT_PROCESS_TIME   = 0x00000002
   JOB_OBJECT_LIMIT_PROCESS_MEMORY = 0x00000100
-  JobObjectExtendedLimitInformation = 9
+  JobObjectExtendedLimitInformation = 9 # rubocop:disable Naming/ConstantName
 
   # Console Events
 
