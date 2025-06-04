@@ -12,7 +12,6 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.1" # required for the use of Integer
   spec.add_dependency("ffi", "~> 1.17")
-  spec.add_development_dependency("cookstyle", "~> 8.1")
 
   spec.description = <<-EOF
     The win32-process library implements several Process methods that are
