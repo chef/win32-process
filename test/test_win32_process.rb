@@ -35,12 +35,12 @@ class TC_Win32Process < Test::Unit::TestCase
   test "create with common flags works as expected" do
     assert_nothing_raised {
       @@pids << Process.create(
-         app_name: "notepad.exe",
-         creation_flags: Process::DETACHED_PROCESS,
-         process_inherit: false,
-         thread_inherit: true,
-         cwd: "C:\\"
-       ).process_id
+        app_name: "notepad.exe",
+        creation_flags: Process::DETACHED_PROCESS,
+        process_inherit: false,
+        thread_inherit: true,
+        cwd: "C:\\"
+      ).process_id
     }
 
     assert_nothing_raised { Process.kill(9, @@pids.pop) }

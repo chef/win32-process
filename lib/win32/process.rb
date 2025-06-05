@@ -10,7 +10,7 @@ module Process
   extend Process::Constants
 
   # The version of the win32-process library.
-  WIN32_PROCESS_VERSION = "1.0.0"
+  WIN32_PROCESS_VERSION = "1.0.0".freeze
 
   # Disable popups. This mostly affects the Process.kill method.
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX)
@@ -487,9 +487,9 @@ module Process
 
       # Set default values
       hash = {
-        "app_name"       => nil,
+        "app_name" => nil,
         "creation_flags" => 0,
-        "close_handles"  => true,
+        "close_handles" => true,
       }
 
       # Validate the keys, and convert symbols and case to lowercase strings.

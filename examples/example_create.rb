@@ -9,14 +9,14 @@ require "win32/process"
 p Process::WIN32_PROCESS_VERSION
 
 struct = Process.create(
-   app_name: "notepad.exe",
-   creation_flags: Process::DETACHED_PROCESS,
-   process_inherit: false,
-   thread_inherit: true,
-   cwd: "C:\\",
-   inherit: true,
-   environment: "SYSTEMROOT=#{ENV["SYSTEMROOT"]};PATH=C:\\"
- )
+  app_name: "notepad.exe",
+  creation_flags: Process::DETACHED_PROCESS,
+  process_inherit: false,
+  thread_inherit: true,
+  cwd: "C:\\",
+  inherit: true,
+  environment: "SYSTEMROOT=#{ENV["SYSTEMROOT"]};PATH=C:\\"
+)
 
 p struct
 

@@ -77,7 +77,7 @@ class TC_Win32_Process_Kill < Test::Unit::TestCase
   # This test is busted under Ruby 3.x with current Windows versions
   # The problem is on Windows, not the code or the test
   # We're testing to see if we're under Buildkite and bypassing
-  if !defined?(ENV["BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG"])
+  unless defined?(ENV["BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG"])
     test "kill accepts BRK or SIGBRK as a signal name" do
       pid = Process.spawn(@cmd)
       assert_nothing_raised { Process.kill(:BRK, pid) }
