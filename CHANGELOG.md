@@ -1,9 +1,17 @@
 # win32-process Changelog
 
 <!-- usage documentation: http://expeditor-docs.es.chef.io/configuration/changelog/ -->
+<!-- latest_release 0.11.0 -->
+## [win32-process-0.11.0](https://github.com/chef/win32-process/tree/win32-process-0.11.0) (2025-06-05)
+
+#### Merged Pull Requests
+- Updating for Ruby 3.4 and Cookstyle [#43](https://github.com/chef/win32-process/pull/43) ([johnmccrae](https://github.com/johnmccrae))
 <!-- latest_release -->
-<!-- latest_release -->
-<!-- release_rollup -->
+<!-- release_rollup since=0.10.0 -->
+### Changes not yet released to rubygems.org
+
+#### Merged Pull Requests
+- Updating for Ruby 3.4 and Cookstyle [#43](https://github.com/chef/win32-process/pull/43) ([johnmccrae](https://github.com/johnmccrae)) <!-- 0.11.0 -->
 <!-- release_rollup -->
 
 <!-- latest_stable_release -->
