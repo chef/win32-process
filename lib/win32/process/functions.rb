@@ -7,7 +7,7 @@ require "ffi" unless defined?(FFI)
 
 module Process::Functions
   module FFI::Library
-    unless instance_methods.include?(:attach_pfunc)
+    unless method_defined?(:attach_pfunc)
       # Wrapper method for attach_function + private
       def attach_pfunc(*args)
         attach_function(*args)
